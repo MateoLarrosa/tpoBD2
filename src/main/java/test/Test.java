@@ -1,0 +1,16 @@
+package test;
+
+import controlador.ProductController;
+public class Test {
+
+	public static void main(String[] args) {
+		System.out.println("Hola Persistencia");
+		
+		//PedidosController p = new PedidosController();
+		//p.agregarCliente("Cacho Garmendia", "23-4567890-1");
+		
+		ProductController pc = new ProductController();
+		pc.agregarProducto("Fanta de uva", "Gaseosa");
+	}
+
+}

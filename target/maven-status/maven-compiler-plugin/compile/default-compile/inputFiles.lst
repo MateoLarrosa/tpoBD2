@@ -1,0 +1,15 @@
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\connections\MongoPool.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\connections\ObjectDBPool.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\controlador\PedidosController.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\controlador\ProductController.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\exceptions\ErrorConectionMongoException.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\modelo\Cliente.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\modelo\CuentaCorriente.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\modelo\Movimiento.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\modelo\Pedido.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\modelo\Producto.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\repositories\MongoRepository.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\repositories\ObjectRepository.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\services\ClienteService.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\services\ProductoService.java
+C:\Users\Joaquin\Desktop\tpdb2\src\main\java\test\Test.java

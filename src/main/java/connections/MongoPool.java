@@ -12,11 +12,17 @@ public class MongoPool {
 	private static MongoPool instancia;
 	private final String url ;
 	private final MongoClient mongoClient;
-	private final String DBSTRING = "labs1510";
-	
+	private final String DBSTRING;
+    
 	private MongoPool() {
-		url = "mongodb://127.0.01:27017";
+		String envUrl = System.getenv("MONGO_URL");
+		if (envUrl == null || envUrl.isEmpty()) {
+			envUrl = "mongodb://127.0.0.1:27017";
+		}
+		url = envUrl;
 		mongoClient = MongoClients.create(url);
+		String envDb = System.getenv("MONGO_DB");
+		DBSTRING = (envDb != null && !envDb.isEmpty()) ? envDb : "tpdb";
 	}
 	
 	public static MongoPool getInstancia(){
@@ -27,11 +33,12 @@ public class MongoPool {
 	
 	public MongoDatabase getConection(String database) throws ErrorConectionMongoException {
 		try {
-			MongoDatabase db = mongoClient.getDatabase(DBSTRING);
+			String dbName = (database != null && !database.isEmpty()) ? database : DBSTRING;
+			MongoDatabase db = mongoClient.getDatabase(dbName);
 			return db;
 		}
 		catch (Exception e) {
-			throw new ErrorConectionMongoException("Error ene la coneccxion a MongoDB");
+			throw new ErrorConectionMongoException("Error en la conexión a MongoDB: " + e.getMessage());
 		}
 	}
 }

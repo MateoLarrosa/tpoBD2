@@ -14,6 +14,12 @@
             "type": "jdk",
             "request": "launch",
             "name": "Launch Java App"
+        },
+        {
+            "type": "jdk",
+            "name": "Launch Test",
+            "request": "launch",
+            "mainClass": "test.Test"
         }
     ]
 }

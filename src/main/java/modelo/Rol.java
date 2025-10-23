@@ -8,4 +8,8 @@ public class Rol {
         this.id = id;
         this.nombre = nombre;
     }
+
+    public String getNombre() {
+        return nombre;
+    }
 }

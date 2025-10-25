@@ -34,4 +34,8 @@ public class UsuarioService {
             return false;
         }
     }
+
+    public java.util.List<Usuario> obtenerTodosLosUsuarios() {
+        return usuarioRepository.findAll();
+    }
 }

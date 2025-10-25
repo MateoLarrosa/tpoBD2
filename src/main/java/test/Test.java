@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 import controlador.UsuarioController;
 import modelo.EstadoUsuario;
-import modelo.Rol;
 import services.UsuarioService;
 
 public class Test {
@@ -34,7 +33,7 @@ public class Test {
         EstadoUsuario estado = EstadoUsuario.valueOf(scanner.nextLine().toUpperCase());
 
         System.out.println("Ingrese el rol del usuario:");
-        Rol rol = new Rol("1", scanner.nextLine());
+        String rol = scanner.nextLine();
 
         // Create user
         usuarioController.crearUsuario(id, nombre, email, password, estado, rol);

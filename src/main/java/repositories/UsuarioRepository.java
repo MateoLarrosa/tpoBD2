@@ -1,4 +1,5 @@
 package repositories;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +13,12 @@ import com.mongodb.client.result.InsertOneResult;
 
 import modelo.CuentaCorriente;
 import modelo.EstadoUsuario;
-import modelo.Rol;
 import modelo.Usuario;
 
 public class UsuarioRepository implements IRepository<Usuario> {
 
     private final MongoDatabase database;
-    private static final String COLLECTION_NAME = "Usuario";
+    private static final String COLLECTION_NAME = "usuarios";
 
     public UsuarioRepository() {
         this.database = MongoConnectionManager.getInstance().getDatabase();
@@ -31,7 +31,7 @@ public class UsuarioRepository implements IRepository<Usuario> {
                 doc.getString("email"),
                 doc.getString("password"),
                 EstadoUsuario.valueOf(doc.getString("estado")),
-                new Rol(null, doc.getString("rol")),
+                doc.getString("rol"),
                 new CuentaCorriente(doc.getDouble("cuentaCorriente"))
         );
     }
@@ -39,43 +39,32 @@ public class UsuarioRepository implements IRepository<Usuario> {
     @Override
     public InsertOneResult save(Usuario usuario) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
-        
-        // Debug: Verificar valores antes de crear el documento
-        System.out.println("=== DEBUG USUARIO ===");
-        System.out.println("Nombre: " + usuario.getNombre());
-        System.out.println("Email: " + usuario.getEmail());
-        System.out.println("Password: " + usuario.getPassword());
-        System.out.println("Rol: " + (usuario.getRol() != null ? usuario.getRol().getNombre() : "NULL"));
-        System.out.println("Estado: " + (usuario.getEstado() != null ? usuario.getEstado().name() : "NULL"));
-        System.out.println("FechaRegistro: " + (usuario.getFechaRegistro() != null ? usuario.getFechaRegistro().toString() : "NULL"));
-        System.out.println("CuentaCorriente: " + (usuario.getCuentaCorriente() != null ? usuario.getCuentaCorriente().getSaldo() : "NULL"));
-        System.out.println("===================");
-        
+
+        System.out.println("DEBUG: Preparing to save Usuario:");
+        System.out.println("  nombre: " + usuario.getNombre());
+        System.out.println("  email: " + usuario.getEmail());
+        System.out.println("  password: " + (usuario.getPassword() != null ? "[REDACTED]" : null));
+        System.out.println("  rol: " + usuario.getRol());
+        System.out.println("  fechaRegistro: " + usuario.getFechaRegistro());
+        System.out.println("  cuentaCorriente.saldo: " + (usuario.getCuentaCorriente() != null ? usuario.getCuentaCorriente().getSaldo() : null));
+        System.out.println("  estado: " + (usuario.getEstado() != null ? usuario.getEstado().name() : null));
+
         Document doc = new Document("nombre", usuario.getNombre())
                 .append("email", usuario.getEmail())
-                .append("password", usuario.getPassword());
+                .append("password", usuario.getPassword())
+                .append("rol", usuario.getRol() != null ? usuario.getRol() : null)
+                .append("fechaRegistro", usuario.getFechaRegistro())
+                .append("cuentaCorriente", usuario.getCuentaCorriente() != null ? usuario.getCuentaCorriente().getSaldo() : null)
+                .append("estado", usuario.getEstado() != null ? usuario.getEstado().name() : null);
                 
-        // Agregar campos solo si no son null
-        if (usuario.getRol() != null && usuario.getRol().getNombre() != null) {
-            doc.append("rol", usuario.getRol().getNombre());
-        }
-        if (usuario.getEstado() != null) {
-            doc.append("estado", usuario.getEstado().name());
-        }
-        if (usuario.getFechaRegistro() != null) {
-            doc.append("fechaRegistro", usuario.getFechaRegistro().toString());
-        }
-        if (usuario.getCuentaCorriente() != null) {
-            doc.append("cuentaCorriente", usuario.getCuentaCorriente().getSaldo());
-        }
-        
-        System.out.println("Documento a guardar: " + doc.toJson());
-        
+
         InsertOneResult result = collection.insertOne(doc);
         if (result != null && result.getInsertedId() != null && result.getInsertedId().isObjectId()) {
             usuario.setId(result.getInsertedId().asObjectId().getValue().toString());
         }
+
         return result;
+
     }
 
     @Override

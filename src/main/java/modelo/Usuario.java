@@ -7,12 +7,12 @@ public class Usuario {
     private String nombre;
     private String email;
     private String password;
-    private Rol rol;
+    private String rol;
     private EstadoUsuario estado;
     private LocalDateTime fechaRegistro;
     private CuentaCorriente cuentaCorriente;
 
-    public Usuario(String id, String nombre, String email, String password, EstadoUsuario estado, Rol rol, CuentaCorriente cuentaCorriente) {
+    public Usuario(String id, String nombre, String email, String password, EstadoUsuario estado, String rol, CuentaCorriente cuentaCorriente) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;
@@ -35,7 +35,7 @@ public class Usuario {
         return password;
     }
 
-    public Rol getRol() {
+    public String getRol() {
         return rol;
     }
     

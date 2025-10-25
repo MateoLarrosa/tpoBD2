@@ -11,5 +11,8 @@ DEPENDENCIES_DIR="$BASE_DIR/target/dependency"
 # Asegurarse de que las dependencias estén descargadas
 mvn dependency:copy-dependencies -DoutputDirectory=$DEPENDENCIES_DIR
 
-# Ejecutar el archivo Test.class con todas las dependencias
-java -cp "$TARGET_DIR:$DEPENDENCIES_DIR/*" test.Test
+# Compilar los archivos Java
+mvn compile
+
+# Ejecutar el archivo Main.class con todas las dependencias
+java -cp "$TARGET_DIR:$DEPENDENCIES_DIR/*" main.Main

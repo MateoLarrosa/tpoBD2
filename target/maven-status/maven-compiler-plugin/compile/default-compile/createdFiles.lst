@@ -1,7 +1,6 @@
 connections/MongoPool.class
 modelo/CuentaCorriente.class
 test/Test.class
-services/ProductoService.class
 modelo/HistorialDeEjecucion.class
 connections/CassandraPool.class
 modelo/EstadoFactura.class
@@ -10,10 +9,12 @@ modelo/Proceso.class
 modelo/Pago.class
 modelo/EstadoUsuario.class
 modelo/Usuario.class
-modelo/Rol.class
+repositories/IRepository.class
+main/Main.class
 modelo/Factura.class
+controlador/UsuarioController.class
 connections/RedisPool.class
 exceptions/ErrorConectionMongoException.class
-repositories/MongoRepository.class
 services/UsuarioService.class
-controlador/ProductController.class
+repositories/MongoConnectionManager.class
+repositories/UsuarioRepository.class

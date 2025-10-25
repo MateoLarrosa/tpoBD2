@@ -3,6 +3,7 @@ package modelo;
 import java.time.LocalDateTime;
 
 public class Usuario {
+
     private String id;
     private String nombre;
     private String email;
@@ -31,6 +32,10 @@ public class Usuario {
         return email;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -38,7 +43,7 @@ public class Usuario {
     public String getRol() {
         return rol;
     }
-    
+
     public EstadoUsuario getEstado() {
         return estado;
     }

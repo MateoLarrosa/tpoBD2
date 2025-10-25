@@ -7,6 +7,7 @@ import java.util.Scanner;
 import modelo.Usuario;
 
 public class MenuUsuario implements Menu {
+
     // Método para limpiar la consola
     private void limpiarConsola() {
         try {
@@ -17,7 +18,9 @@ public class MenuUsuario implements Menu {
                 System.out.flush();
             }
         } catch (Exception e) {
-            for (int i = 0; i < 50; i++) System.out.println();
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
         }
     }
     private final Usuario usuario;
@@ -27,8 +30,8 @@ public class MenuUsuario implements Menu {
     public MenuUsuario(Usuario usuario, Scanner scanner) {
         this.usuario = usuario;
         this.scanner = scanner;
-    options.add(new MenuOption("Ver perfil", this::verPerfil));
-    options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
+        options.add(new MenuOption("Ver perfil", this::verPerfil));
+        options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
     }
 
     private void verPerfil() {

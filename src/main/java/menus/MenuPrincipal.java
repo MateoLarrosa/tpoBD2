@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Scanner;
 
 import controlador.UsuarioController;
-import modelo.CuentaCorriente;
 import modelo.EstadoUsuario;
 import modelo.Usuario;
-import services.UsuarioService;
+// import services.UsuarioService;
 
 public class MenuPrincipal implements Menu {
+
     // Método para limpiar la consola
     private void limpiarConsola() {
         try {
@@ -22,17 +22,17 @@ public class MenuPrincipal implements Menu {
             }
         } catch (Exception e) {
             // Si falla, imprime saltos de línea como fallback
-            for (int i = 0; i < 50; i++) System.out.println();
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
         }
     }
-    private final UsuarioService usuarioService;
     private final UsuarioController usuarioController;
     private final Scanner scanner;
     private final List<MenuOption> options = new ArrayList<>();
     private boolean salir = false;
 
-    public MenuPrincipal(UsuarioService usuarioService, UsuarioController usuarioController, Scanner scanner) {
-        this.usuarioService = usuarioService;
+    public MenuPrincipal(UsuarioController usuarioController, Scanner scanner) {
         this.usuarioController = usuarioController;
         this.scanner = scanner;
         options.add(new MenuOption("Iniciar sesión", this::iniciarSesion));
@@ -41,14 +41,14 @@ public class MenuPrincipal implements Menu {
     }
 
     private void iniciarSesion() {
-        List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
+        List<Usuario> usuarios = usuarioController.obtenerTodosLosUsuarios();
         if (usuarios.isEmpty()) {
             System.out.println("No hay usuarios registrados.\n");
             return;
         }
         System.out.println("Usuarios disponibles:");
         for (int i = 0; i < usuarios.size(); i++) {
-            System.out.println((i+1) + ". " + usuarios.get(i).getNombre() + " (" + usuarios.get(i).getEmail() + ")");
+            System.out.println((i + 1) + ". " + usuarios.get(i).getNombre() + " (" + usuarios.get(i).getEmail() + ")");
         }
         System.out.print("Seleccione el número de usuario para iniciar sesión: ");
         try {
@@ -76,8 +76,8 @@ public class MenuPrincipal implements Menu {
         EstadoUsuario estado = EstadoUsuario.valueOf(scanner.nextLine().toUpperCase());
         System.out.print("Ingrese el rol: ");
         String rol = scanner.nextLine();
-        Usuario nuevoUsuario = new Usuario(null, nombre, email, password, estado, rol, new CuentaCorriente(0.0));
-        if (usuarioService.crearUsuario(nuevoUsuario)) {
+        boolean creado = usuarioController.crearUsuario(null, nombre, email, password, estado, rol);
+        if (creado) {
             System.out.println("Usuario creado exitosamente.\n");
         } else {
             System.out.println("Error al crear usuario.\n");
@@ -91,7 +91,7 @@ public class MenuPrincipal implements Menu {
 
     @Override
     public void show() {
-        if (usuarioService.obtenerTodosLosUsuarios().isEmpty()) {
+        if (usuarioController.obtenerTodosLosUsuarios().isEmpty()) {
             System.out.println("No hay usuarios registrados.\n");
             return;
         }

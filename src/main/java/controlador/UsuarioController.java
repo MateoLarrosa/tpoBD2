@@ -1,19 +1,26 @@
 package controlador;
 
+import java.util.List;
+
 import modelo.CuentaCorriente;
 import modelo.EstadoUsuario;
 import modelo.Usuario;
 import services.UsuarioService;
 
 public class UsuarioController {
+
     private final UsuarioService usuarioService;
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
-    public void crearUsuario(String id, String nombre, String email, String password, EstadoUsuario estado, String rol) {
+    public boolean crearUsuario(String id, String nombre, String email, String password, EstadoUsuario estado, String rol) {
         Usuario usuario = new Usuario(id, nombre, email, password, estado, rol, new CuentaCorriente(0.0));
-        usuarioService.crearUsuario(usuario);
+        return usuarioService.crearUsuario(usuario);
+    }
+
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        return usuarioService.obtenerTodosLosUsuarios();
     }
 }

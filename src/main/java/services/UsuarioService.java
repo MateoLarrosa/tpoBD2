@@ -1,5 +1,7 @@
 package services;
 
+import java.util.ArrayList;
+
 import modelo.Usuario;
 import repositories.UsuarioRepository;
 
@@ -35,7 +37,7 @@ public class UsuarioService {
         }
     }
 
-    public java.util.List<Usuario> obtenerTodosLosUsuarios() {
-        return usuarioRepository.findAll();
+    public ArrayList<Usuario> obtenerTodosLosUsuarios() {
+        return new ArrayList<>(usuarioRepository.findAll());
     }
 }

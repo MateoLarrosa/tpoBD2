@@ -6,6 +6,12 @@
   <name>CatalogoProductos</name>
   
     <dependencies>
+    <!-- SLF4J Simple para controlar el logging del driver de MongoDB -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>2.0.13</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync -->
 	<dependency>
 	    <groupId>org.mongodb</groupId>

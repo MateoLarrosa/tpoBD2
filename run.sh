@@ -1,4 +1,8 @@
+
 #!/bin/bash
+
+# Exportar variables del .env
+export $(grep -v '^#' .env | xargs)
 
 # Cambiar al directorio del script
 cd "$(dirname $(realpath $0))"

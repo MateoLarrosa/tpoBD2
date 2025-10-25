@@ -11,6 +11,20 @@ import modelo.Usuario;
 import services.UsuarioService;
 
 public class MenuPrincipal implements Menu {
+    // Método para limpiar la consola
+    private void limpiarConsola() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Si falla, imprime saltos de línea como fallback
+            for (int i = 0; i < 50; i++) System.out.println();
+        }
+    }
     private final UsuarioService usuarioService;
     private final UsuarioController usuarioController;
     private final Scanner scanner;
@@ -82,6 +96,7 @@ public class MenuPrincipal implements Menu {
             return;
         }
         while (!salir) {
+            limpiarConsola();
             System.out.println("--- MENÚ PRINCIPAL ---");
             for (int i = 0; i < options.size(); i++) {
                 System.out.println((i + 1) + ". " + options.get(i).getTitle());

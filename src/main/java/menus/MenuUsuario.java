@@ -7,6 +7,19 @@ import java.util.Scanner;
 import modelo.Usuario;
 
 public class MenuUsuario implements Menu {
+    // Método para limpiar la consola
+    private void limpiarConsola() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 50; i++) System.out.println();
+        }
+    }
     private final Usuario usuario;
     private final Scanner scanner;
     private final List<MenuOption> options = new ArrayList<>();
@@ -14,8 +27,8 @@ public class MenuUsuario implements Menu {
     public MenuUsuario(Usuario usuario, Scanner scanner) {
         this.usuario = usuario;
         this.scanner = scanner;
-        options.add(new MenuOption("Ver perfil", this::verPerfil));
-        options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
+    options.add(new MenuOption("Ver perfil", this::verPerfil));
+    options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
     }
 
     private void verPerfil() {
@@ -36,6 +49,7 @@ public class MenuUsuario implements Menu {
     public void show() {
         boolean continuar = true;
         while (continuar) {
+            limpiarConsola();
             System.out.println("--- MENÚ DE USUARIO ---");
             for (int i = 0; i < options.size(); i++) {
                 System.out.println((i + 1) + ". " + options.get(i).getTitle());
@@ -46,7 +60,8 @@ public class MenuUsuario implements Menu {
                 int idx = Integer.parseInt(opcion) - 1;
                 if (idx >= 0 && idx < options.size()) {
                     options.get(idx).execute();
-                    if (options.get(idx).getTitle().equals("Cerrar sesión")) {
+                    String title = options.get(idx).getTitle();
+                    if (title.equals("Cerrar sesión")) {
                         continuar = false;
                     }
                 } else {

@@ -8,9 +8,17 @@ import repositories.UsuarioRepository;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private static UsuarioService instance;
 
-    public UsuarioService() {
-        this.usuarioRepository = new UsuarioRepository();
+    private UsuarioService() {
+        this.usuarioRepository = UsuarioRepository.getInstance();
+    }
+
+    public static UsuarioService getInstance() {
+        if (instance == null) {
+            instance = new UsuarioService();
+        }
+        return instance;
     }
 
     public boolean crearUsuario(Usuario usuario) {

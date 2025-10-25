@@ -14,9 +14,17 @@ import services.MensajeriaService;
 public class MensajeriaController {
 
     private final MensajeriaService servicio;
+    private static MensajeriaController instance;
 
-    public MensajeriaController(MensajeriaService servicio) {
-        this.servicio = servicio;
+    private MensajeriaController() {
+        this.servicio = MensajeriaService.getInstance();
+    }
+
+    public static MensajeriaController getInstance() {
+        if (instance == null) {
+            instance = new MensajeriaController();
+        }
+        return instance;
     }
 
     // POST /mensajeria/enviar

@@ -2,23 +2,17 @@ package main;
 
 import java.util.List;
 
-import connections.RedisPool;
 import controlador.MensajeriaController;
 import exceptions.ErrorConectionMongoException;
 import modelo.Mensaje;
-import repositories.RedisMessageRepository;
-import services.MensajeriaService;
 
 public class MainMensajeria {
 
     public static void main(String[] args) {
         try {
             System.out.println("Iniciando sistema de mensajería...");
-            // Inyección manual de dependencias
-            RedisPool pool = RedisPool.getInstancia();
-            RedisMessageRepository repositorio = new RedisMessageRepository(pool);
-            MensajeriaService servicio = new MensajeriaService(repositorio);
-            MensajeriaController controlador = new MensajeriaController(servicio);
+            // Obtener las instancias usando el patrón Singleton
+            MensajeriaController controlador = MensajeriaController.getInstance();
 
             // Escenario: Ana ↔ Bruno
             String ana = "user_101";

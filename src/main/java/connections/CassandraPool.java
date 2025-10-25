@@ -9,7 +9,7 @@ import exceptions.ErrorConectionMongoException;
 
 public class CassandraPool {
 
-    private static CassandraPool instancia;
+    private static CassandraPool instance;
     private final String contactPoints;
     private final String keyspace;
     private final CqlSession session;
@@ -46,11 +46,11 @@ public class CassandraPool {
         session = builder.withKeyspace(keyspace).build();
     }
 
-    public static CassandraPool getInstancia() {
-        if (instancia == null) {
-            instancia = new CassandraPool();
+    public static CassandraPool getInstance() {
+        if (instance == null) {
+            instance = new CassandraPool();
         }
-        return instancia;
+        return instance;
     }
 
     public CqlSession getSession() throws ErrorConectionMongoException {

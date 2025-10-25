@@ -15,9 +15,17 @@ import repositories.RedisMessageRepository;
 public class MensajeriaService {
 
     private final RedisMessageRepository repositorio;
+    private static MensajeriaService instance;
 
-    public MensajeriaService(RedisMessageRepository repositorio) {
-        this.repositorio = repositorio;
+    private MensajeriaService() {
+        this.repositorio = RedisMessageRepository.getInstance();
+    }
+
+    public static MensajeriaService getInstance() {
+        if (instance == null) {
+            instance = new MensajeriaService();
+        }
+        return instance;
     }
 
     /**

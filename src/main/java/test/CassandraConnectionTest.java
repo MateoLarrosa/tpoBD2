@@ -5,9 +5,10 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import connections.CassandraPool;
 
 public class CassandraConnectionTest {
+
     public static void main(String[] args) {
         try {
-            CassandraPool pool = CassandraPool.getInstancia();
+            CassandraPool pool = CassandraPool.getInstance();
             CqlSession session = pool.getSession();
             System.out.println("Conexión a Cassandra exitosa: " + session.getName());
             pool.closeSession();

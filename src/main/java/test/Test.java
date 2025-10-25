@@ -4,17 +4,15 @@ import java.util.Scanner;
 
 import controlador.UsuarioController;
 import modelo.EstadoUsuario;
-import services.UsuarioService;
 
 public class Test {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
 
-        // Create services and controller
-        UsuarioService usuarioService = new UsuarioService();
-        UsuarioController usuarioController = new UsuarioController(usuarioService);
+        // Obtener instancia del controller usando Singleton
+        UsuarioController usuarioController = UsuarioController.getInstance();
 
         // Get user input
         System.out.println("Ingrese el ID del usuario:");
@@ -41,5 +39,5 @@ public class Test {
         System.out.println("Usuario creado exitosamente.");
 
         scanner.close();
-	}
+    }
 }

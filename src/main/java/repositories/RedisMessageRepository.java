@@ -19,9 +19,17 @@ import redis.clients.jedis.resps.StreamEntry;
 public class RedisMessageRepository {
 
     private final RedisPool pool;
+    private static RedisMessageRepository instance;
 
-    public RedisMessageRepository(RedisPool pool) {
-        this.pool = pool;
+    private RedisMessageRepository() {
+        this.pool = RedisPool.getInstance();
+    }
+
+    public static RedisMessageRepository getInstance() {
+        if (instance == null) {
+            instance = new RedisMessageRepository();
+        }
+        return instance;
     }
 
     // XADD

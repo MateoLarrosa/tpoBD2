@@ -19,9 +19,17 @@ public class UsuarioRepository implements IRepository<Usuario> {
 
     private final MongoDatabase database;
     private static final String COLLECTION_NAME = "usuarios";
+    private static UsuarioRepository instance;
 
-    public UsuarioRepository() {
+    private UsuarioRepository() {
         this.database = MongoConnectionManager.getInstance().getDatabase();
+    }
+
+    public static UsuarioRepository getInstance() {
+        if (instance == null) {
+            instance = new UsuarioRepository();
+        }
+        return instance;
     }
 
     private Usuario mapDocumentToUsuario(Document doc) {
@@ -56,7 +64,6 @@ public class UsuarioRepository implements IRepository<Usuario> {
                 .append("fechaRegistro", usuario.getFechaRegistro())
                 .append("cuentaCorriente", usuario.getCuentaCorriente() != null ? usuario.getCuentaCorriente().getSaldo() : null)
                 .append("estado", usuario.getEstado() != null ? usuario.getEstado().name() : null);
-                
 
         InsertOneResult result = collection.insertOne(doc);
         if (result != null && result.getInsertedId() != null && result.getInsertedId().isObjectId()) {

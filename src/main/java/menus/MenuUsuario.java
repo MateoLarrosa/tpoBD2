@@ -26,13 +26,16 @@ public class MenuUsuario implements Menu {
     }
 
     private void verPerfil() {
-        System.out.println("\n--- PERFIL DE USUARIO ---");
+        ConsolaUtils.limpiarConsola();
+        ConsolaUtils.mostrarTitulo("PERFIL DE USUARIO");
         System.out.println("Nombre: " + usuario.getNombre());
         System.out.println("Email: " + usuario.getEmail());
         System.out.println("Rol: " + usuario.getRol());
         System.out.println("Estado: " + usuario.getEstado());
         System.out.println("Saldo cuenta corriente: " + usuario.getCuentaCorriente().getSaldo());
         System.out.println();
+        System.out.print("Presione Enter para continuar...");
+        scanner.nextLine();
     }
 
     private void cerrarSesion() {
@@ -45,10 +48,12 @@ public class MenuUsuario implements Menu {
         boolean continuar = true;
         while (continuar) {
             ConsolaUtils.limpiarConsola();
-            System.out.println("--- MENÚ DE USUARIO ---");
-            for (int i = 0; i < options.size(); i++) {
-                System.out.println((i + 1) + ". " + options.get(i).getTitle());
+            ConsolaUtils.mostrarTitulo("MENÚ DE USUARIO");
+            java.util.List<String> opcionesMenu = new java.util.ArrayList<>();
+            for (MenuOption option : options) {
+                opcionesMenu.add(option.getTitle());
             }
+            ConsolaUtils.mostrarOpciones(opcionesMenu);
             System.out.print("Seleccione una opción: ");
             String opcion = scanner.nextLine();
             try {

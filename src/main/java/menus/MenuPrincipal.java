@@ -24,6 +24,7 @@ public class MenuPrincipal implements Menu {
     }
 
     private void iniciarSesion() {
+        ConsolaUtils.limpiarConsola();
         List<Usuario> usuarios = usuarioController.obtenerTodosLosUsuarios();
         if (usuarios.isEmpty()) {
             System.out.println("No hay usuarios registrados.\n");
@@ -49,6 +50,7 @@ public class MenuPrincipal implements Menu {
     }
 
     private void crearUsuario() {
+        ConsolaUtils.limpiarConsola();
         System.out.print("Ingrese el nombre: ");
         String nombre = scanner.nextLine();
         System.out.print("Ingrese el email: ");
@@ -79,10 +81,12 @@ public class MenuPrincipal implements Menu {
         }
         while (!salir) {
             ConsolaUtils.limpiarConsola();
-            System.out.println("--- MENÚ PRINCIPAL ---");
-            for (int i = 0; i < options.size(); i++) {
-                System.out.println((i + 1) + ". " + options.get(i).getTitle());
+            ConsolaUtils.mostrarTitulo("MENÚ PRINCIPAL");
+            java.util.List<String> opcionesMenu = new java.util.ArrayList<>();
+            for (MenuOption option : options) {
+                opcionesMenu.add(option.getTitle());
             }
+            ConsolaUtils.mostrarOpciones(opcionesMenu);
             System.out.print("Seleccione una opción: ");
             String opcion = scanner.nextLine();
             try {

@@ -32,7 +32,6 @@ public class RedisMessageRepository {
         return instance;
     }
 
-    // XADD
     public String appendMessage(String chatKey, String remitenteId, String contenido) throws ErrorConectionMongoException {
         return pool.execute(jedis -> {
             Map<String, String> fields = new HashMap<>();
@@ -43,7 +42,6 @@ public class RedisMessageRepository {
         });
     }
 
-    // XREVRANGE chatKey + - COUNT n  (últimos n mensajes, más nuevo primero)
     public List<Mensaje> getLastMessages(String chatKey, int count) throws ErrorConectionMongoException {
         return pool.execute(jedis -> {
             List<StreamEntry> entries = jedis.xrevrange(chatKey, "+", "-", count);
@@ -53,12 +51,10 @@ public class RedisMessageRepository {
         });
     }
 
-    // Crear consumer group si no existe (XGROUP CREATE mkstream)
     public void ensureConsumerGroup(String chatKey, String groupName) throws ErrorConectionMongoException {
         pool.execute((Jedis jedis) -> {
             try {
-                // Intentamos crear; si existe, lanzará excepción -> la ignoramos.
-                jedis.xgroupCreate(chatKey, groupName, StreamEntryID.LAST_ENTRY, true); // mkstream=true
+                jedis.xgroupCreate(chatKey, groupName, StreamEntryID.LAST_ENTRY, true);
             } catch (Exception ignored) {
             }
             return null;
@@ -68,12 +64,10 @@ public class RedisMessageRepository {
     public List<Mensaje> readNewMessages(String chatKey, String groupName, String consumer, int count, int blockMs) throws ErrorConectionMongoException {
 
         return pool.execute(jedis -> {
-            // Params: COUNT + BLOCK
             XReadGroupParams params = XReadGroupParams.xReadGroupParams()
                     .count(count)
                     .block(blockMs);  // <- int
 
-            // Stream a leer desde '>'
             Map<String, StreamEntryID> streams
                     = Collections.singletonMap(chatKey, StreamEntryID.UNRECEIVED_ENTRY);
 
@@ -98,7 +92,6 @@ public class RedisMessageRepository {
         });
     }
 
-    // Confirmación de procesamiento (XACK)
     public long ackMessages(String chatKey, String groupName, List<String> ids) throws ErrorConectionMongoException {
         return pool.execute(jedis -> jedis.xack(chatKey, groupName, ids.stream().map(StreamEntryID::new).toArray(StreamEntryID[]::new)));
     }

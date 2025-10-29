@@ -10,21 +10,6 @@ import modelo.Usuario;
 
 public class MenuPrincipal implements Menu {
 
-    // Método para limpiar la consola
-    private void limpiarConsola() {
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-            }
-        } catch (Exception e) {
-            for (int i = 0; i < 50; i++) {
-                System.out.println();
-            }
-        }
-    }
     private final UsuarioController usuarioController;
     private final List<MenuOption> options = new ArrayList<>();
     private final Scanner scanner;
@@ -93,7 +78,7 @@ public class MenuPrincipal implements Menu {
             System.out.println("No hay usuarios registrados.\n");
         }
         while (!salir) {
-            limpiarConsola();
+            ConsolaUtils.limpiarConsola();
             System.out.println("--- MENÚ PRINCIPAL ---");
             for (int i = 0; i < options.size(); i++) {
                 System.out.println((i + 1) + ". " + options.get(i).getTitle());

@@ -21,20 +21,19 @@ public class RedisPool {
         redisUrl = envRedisUrl;
 
         try {
-            // Configuración del pool de conexiones
             JedisPoolConfig poolConfig = new JedisPoolConfig();
-            poolConfig.setMaxTotal(20); // máximo 20 conexiones
-            poolConfig.setMaxIdle(10);  // máximo 10 conexiones idle
-            poolConfig.setMinIdle(2);   // mínimo 2 conexiones idle
+            poolConfig.setMaxTotal(20);
+            poolConfig.setMaxIdle(10);
+            poolConfig.setMinIdle(2);
             poolConfig.setTestOnBorrow(true);
             poolConfig.setTestOnReturn(true);
 
-            // Crear pool usando la URL
+            
             if (redisUrl.startsWith("redis://")) {
                 URI redisUri = URI.create(redisUrl);
                 jedisPool = new JedisPool(poolConfig, redisUri);
             } else {
-                // Fallback para host:puerto sin protocolo
+                
                 String[] hostPort = redisUrl.split(":");
                 String host = hostPort[0];
                 int port = hostPort.length > 1 ? Integer.parseInt(hostPort[1]) : 6379;
@@ -55,7 +54,7 @@ public class RedisPool {
     public Jedis getConnection() throws ErrorConectionMongoException {
         try {
             Jedis jedis = jedisPool.getResource();
-            // Probar la conexión con un ping
+            
             jedis.ping();
             return jedis;
         } catch (Exception e) {
@@ -65,7 +64,7 @@ public class RedisPool {
 
     public void returnConnection(Jedis jedis) {
         if (jedis != null) {
-            jedis.close(); // En Jedis 3.x+, close() devuelve la conexión al pool
+            jedis.close();
         }
     }
 
@@ -75,7 +74,7 @@ public class RedisPool {
         }
     }
 
-    // Método de conveniencia para ejecutar operaciones con manejo automático de conexiones
+    
     public <T> T execute(RedisOperation<T> operation) throws ErrorConectionMongoException {
         Jedis jedis = null;
         try {
@@ -86,7 +85,7 @@ public class RedisPool {
         }
     }
 
-    // Interface funcional para operaciones Redis
+
     @FunctionalInterface
     public interface RedisOperation<T> {
 

@@ -8,21 +8,6 @@ import modelo.Usuario;
 
 public class MenuUsuario implements Menu {
 
-    // Método para limpiar la consola
-    private void limpiarConsola() {
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-            }
-        } catch (Exception e) {
-            for (int i = 0; i < 50; i++) {
-                System.out.println();
-            }
-        }
-    }
 
     private final Usuario usuario;
     private final List<MenuOption> options = new ArrayList<>();
@@ -59,7 +44,7 @@ public class MenuUsuario implements Menu {
     public void show() {
         boolean continuar = true;
         while (continuar) {
-            limpiarConsola();
+            ConsolaUtils.limpiarConsola();
             System.out.println("--- MENÚ DE USUARIO ---");
             for (int i = 0; i < options.size(); i++) {
                 System.out.println((i + 1) + ". " + options.get(i).getTitle());

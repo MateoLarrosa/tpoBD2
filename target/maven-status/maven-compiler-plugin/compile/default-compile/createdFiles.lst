@@ -1,5 +1,6 @@
 main/MainMensajeria.class
 modelo/CuentaCorriente.class
+menus/ConsolaUtils.class
 modelo/EstadoFactura.class
 modelo/Proceso.class
 test/CassandraConnectionTest.class

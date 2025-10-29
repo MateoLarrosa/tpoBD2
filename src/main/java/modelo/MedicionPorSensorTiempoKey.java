@@ -5,18 +5,11 @@ import java.util.UUID;
 
 public class MedicionPorSensorTiempoKey {
 
-    // Clave Primaria (Partition Key)
-    private String sensorId; // Usamos String para ser coherentes con el ID del sensor
-
-    // Clave Primaria (Clustering Key)
-    private Instant fechaHora; // Corresponde al 'timestamp' de CQL
-
-    // Atributos de la medición
-    private UUID medicionId; // ID de medición
-    private float temperatura; // Temperatura
-    private float humedad; // Humedad
-
-    // Constructor vacío (necesario para la mayoría de los mapeadores)
+    private String sensorId;
+    private Instant fechaHora;
+    private UUID medicionId;
+    private float temperatura;
+    private float humedad;
     public MedicionPorSensorTiempoKey() {
     }
 

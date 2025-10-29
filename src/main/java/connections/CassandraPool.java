@@ -16,10 +16,10 @@ public class CassandraPool {
     private final String datacenter;
 
     private CassandraPool() {
-        // Leer contact points y keyspace desde variables de entorno, con valores por defecto
+        
         String envContactPoints = System.getenv("CASSANDRA_CONTACT_POINTS");
         if (envContactPoints == null || envContactPoints.isEmpty()) {
-            envContactPoints = "127.0.0.1:9042"; // valor por defecto
+            envContactPoints = "127.0.0.1:9042";
         }
         contactPoints = envContactPoints;
 
@@ -29,10 +29,10 @@ public class CassandraPool {
         String envDatacenter = System.getenv("CASSANDRA_DATACENTER");
         datacenter = (envDatacenter != null && !envDatacenter.isEmpty()) ? envDatacenter : "datacenter1";
 
-        // Crear sesión de Cassandra
+        
         CqlSessionBuilder builder = CqlSession.builder();
 
-        // Parsear contact points (formato: host:puerto,host2:puerto2,...)
+        
         String[] points = contactPoints.split(",");
         for (String point : points) {
             String[] hostPort = point.trim().split(":");
@@ -66,7 +66,7 @@ public class CassandraPool {
 
     public CqlSession getSession(String customKeyspace) throws ErrorConectionMongoException {
         try {
-            // Para usar un keyspace diferente, crear una nueva sesión temporal
+
             CqlSessionBuilder builder = CqlSession.builder();
             String[] points = contactPoints.split(",");
             for (String point : points) {

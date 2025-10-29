@@ -25,6 +25,7 @@ public class MenuChat implements Menu {
     @Override
     public void show() {
         while (!salir) {
+            ConsolaUtils.limpiarConsola();
             System.out.println("\n--- UADE Chat ---");
             System.out.println("1. Ver chats / Crear chat");
             System.out.println("2. Volver al menú principal");
@@ -44,6 +45,7 @@ public class MenuChat implements Menu {
     }
 
     private void verChatsYCrear() {
+        ConsolaUtils.limpiarConsola();
         try {
             List<Usuario> usuarios = controlador.UsuarioController.getInstance().obtenerTodosLosUsuarios();
             Set<String> chats = new HashSet<>();
@@ -51,13 +53,16 @@ public class MenuChat implements Menu {
             for (Usuario u : usuarios) {
                 if (!u.getId().equals(usuario.getId())) {
                     idToUsuario.put(u.getId(), u);
-                    List<Mensaje> historial = MensajeriaController.getInstance().historial(usuario.getId(), u.getId(), 1);
-                    if (!historial.isEmpty()) {
-                        chats.add(u.getId());
+                    try {
+                        List<Mensaje> historial = MensajeriaController.getInstance().historial(usuario.getId(), u.getId(), 1);
+                        if (!historial.isEmpty()) {
+                            chats.add(u.getId());
+                        }
+                    } catch (exceptions.ErrorConectionMongoException ex) {
+                        System.out.println("Error de conexión al obtener historial: " + ex.getMessage());
                     }
                 }
             }
-            // Mostrar menú: 1. Crear chat, luego los chats existentes
             System.out.println("\n--- Tus chats ---");
             System.out.println("1. Crear chat nuevo");
             int i = 2;
@@ -82,13 +87,13 @@ public class MenuChat implements Menu {
             } catch (NumberFormatException e) {
                 System.out.println("Opción inválida.");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("Error al obtener los chats: " + e.getMessage());
         }
     }
 
     private void crearChatNuevo(List<Usuario> usuarios, Set<String> chats) {
-        // Mostrar usuarios con los que NO hay chat
+        ConsolaUtils.limpiarConsola();
         List<Usuario> disponibles = new java.util.ArrayList<>();
         for (Usuario u : usuarios) {
             if (!u.getId().equals(usuario.getId()) && !chats.contains(u.getId())) {
@@ -120,6 +125,7 @@ public class MenuChat implements Menu {
     }
 
     private void mostrarChatCon(String otroId, Usuario otro) {
+        ConsolaUtils.limpiarConsola();
         try {
             List<Mensaje> historial = MensajeriaController.getInstance().historial(usuario.getId(), otroId, 20);
             System.out.println("\n--- Chat con " + otro.getNombre() + " ---");
@@ -130,10 +136,16 @@ public class MenuChat implements Menu {
             System.out.print("Escriba un mensaje (o vacío para volver): ");
             String texto = scanner.nextLine();
             if (!texto.isBlank()) {
-                MensajeriaController.getInstance().enviar(usuario.getId(), otroId, texto);
-                System.out.println("Mensaje enviado.");
+                try {
+                    MensajeriaController.getInstance().enviar(usuario.getId(), otroId, texto);
+                    System.out.println("Mensaje enviado.");
+                } catch (exceptions.ErrorConectionMongoException ex) {
+                    System.out.println("Error de conexión al enviar mensaje: " + ex.getMessage());
+                }
             }
-        } catch (Exception e) {
+        } catch (exceptions.ErrorConectionMongoException e) {
+            System.out.println("Error de conexión al mostrar historial: " + e.getMessage());
+        } catch (RuntimeException e) {
             System.out.println("Error al mostrar/enviar mensaje: " + e.getMessage());
         }
     }

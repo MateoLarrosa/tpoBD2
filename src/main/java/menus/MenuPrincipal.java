@@ -7,7 +7,6 @@ import java.util.Scanner;
 import controlador.UsuarioController;
 import modelo.EstadoUsuario;
 import modelo.Usuario;
-// import services.UsuarioService;
 
 public class MenuPrincipal implements Menu {
 
@@ -21,15 +20,14 @@ public class MenuPrincipal implements Menu {
                 System.out.flush();
             }
         } catch (Exception e) {
-            // Si falla, imprime saltos de línea como fallback
             for (int i = 0; i < 50; i++) {
                 System.out.println();
             }
         }
     }
     private final UsuarioController usuarioController;
-    private final Scanner scanner;
     private final List<MenuOption> options = new ArrayList<>();
+    private final Scanner scanner;
     private boolean salir = false;
 
     public MenuPrincipal(UsuarioController usuarioController, Scanner scanner) {
@@ -93,7 +91,6 @@ public class MenuPrincipal implements Menu {
     public void show() {
         if (usuarioController.obtenerTodosLosUsuarios().isEmpty()) {
             System.out.println("No hay usuarios registrados.\n");
-            return;
         }
         while (!salir) {
             limpiarConsola();

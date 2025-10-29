@@ -25,6 +25,7 @@ services/MensajeriaService.class
 connections/RedisPool$RedisOperation.class
 repositories/IRepository.class
 menus/MenuOption.class
+menus/MenuChat.class
 controlador/UsuarioController.class
 modelo/Mensaje.class
 services/UsuarioService.class

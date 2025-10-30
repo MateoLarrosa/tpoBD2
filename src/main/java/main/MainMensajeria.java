@@ -23,7 +23,7 @@ public class MainMensajeria {
             List<Mensaje> historial = controlador.historial(ana, bruno, 50);
             System.out.println("===== HISTORIAL DEL CHAT =====");
             for (Mensaje m : historial) {
-                System.out.printf("[%s] %s: %s%n", m.getIdRedis(), m.getRemitenteId(), m.getContenido());
+                System.out.printf("[%s] %s%n", m.getIdRedis(), m.getContenido());
             }
 
         } catch (ErrorConectionMongoException e) {

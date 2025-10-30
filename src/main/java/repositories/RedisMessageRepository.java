@@ -32,11 +32,10 @@ public class RedisMessageRepository {
         return instance;
     }
 
-    public String appendMessage(String chatKey, String remitenteId, String contenido) throws ErrorConectionMongoException {
+    public String appendMessage(String chatKey, String contenido) throws ErrorConectionMongoException {
         return pool.execute(jedis -> {
             Map<String, String> fields = new HashMap<>();
-            fields.put("remitente", remitenteId);
-            fields.put("contenido", contenido);
+            fields.put("mensaje", contenido);
             StreamEntryID id = jedis.xadd(chatKey, XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY), fields);
             return id.toString();
         });

@@ -32,13 +32,4 @@ public class MensajeriaController {
         return servicio.obtenerHistorial(usuarioA, usuarioB, cantidad);
     }
 
-    public List<Mensaje> nuevos(String usuario, String otroUsuario, String consumidorId)
-            throws ErrorConectionMongoException {
-        return servicio.leerNuevos(usuario, otroUsuario, consumidorId, 50, 20000);
-    }
-
-    public long confirmar(String usuario, String otroUsuario, List<String> ids)
-            throws ErrorConectionMongoException {
-        return servicio.confirmarLeidos(usuario, otroUsuario, ids);
-    }
 }

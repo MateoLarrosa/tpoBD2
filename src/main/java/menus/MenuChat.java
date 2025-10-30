@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import controlador.MensajeriaController;
+import controlador.UsuarioController;
 import modelo.Mensaje;
 import modelo.Usuario;
 
@@ -50,7 +51,7 @@ public class MenuChat implements Menu {
     private void verChatsYCrear() {
         ConsolaUtils.limpiarConsola();
         try {
-            List<Usuario> usuarios = controlador.UsuarioController.getInstance().obtenerTodosLosUsuarios();
+            List<Usuario> usuarios = UsuarioController.getInstance().obtenerTodosLosUsuarios();
             Set<String> chats = new HashSet<>();
             Map<String, Usuario> idToUsuario = new HashMap<>();
             for (Usuario u : usuarios) {
@@ -134,8 +135,7 @@ public class MenuChat implements Menu {
             List<Mensaje> historial = MensajeriaController.getInstance().historial(usuario.getId(), otroId, 20);
             ConsolaUtils.mostrarTitulo("Chat con " + otro.getNombre());
             for (Mensaje m : historial) {
-                String quien = m.getRemitenteId().equals(usuario.getId()) ? "Tú" : otro.getNombre();
-                System.out.println("[" + quien + "] " + m.getContenido());
+                System.out.println("[Mensaje] " + m.getContenido());
             }
             System.out.print("Escriba un mensaje (o vacío para volver): ");
             String texto = scanner.nextLine();

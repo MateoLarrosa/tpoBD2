@@ -7,11 +7,9 @@ import repositories.UsuarioRepository;
 
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
     private static UsuarioService instance;
 
     private UsuarioService() {
-        this.usuarioRepository = UsuarioRepository.getInstance();
     }
 
     public static UsuarioService getInstance() {
@@ -23,7 +21,7 @@ public class UsuarioService {
 
     public boolean crearUsuario(Usuario usuario) {
         try {
-            usuarioRepository.save(usuario);
+            UsuarioRepository.getInstance().save(usuario);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,12 +30,12 @@ public class UsuarioService {
     }
 
     public Usuario obtenerUsuarioPorId(String id) {
-        return usuarioRepository.findById(id);
+        return UsuarioRepository.getInstance().findById(id);
     }
 
     public boolean eliminarUsuario(String id) {
         try {
-            usuarioRepository.delete(id);
+            UsuarioRepository.getInstance().delete(id);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,6 +44,6 @@ public class UsuarioService {
     }
 
     public ArrayList<Usuario> obtenerTodosLosUsuarios() {
-        return new ArrayList<>(usuarioRepository.findAll());
+        return new ArrayList<>(UsuarioRepository.getInstance().findAll());
     }
 }

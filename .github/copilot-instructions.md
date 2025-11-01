@@ -16,9 +16,9 @@
 - Run main app: `./run.sh` or `Main.java`.
 
 ## Patterns & Conventions
-- Controllers (`controlador/`) orchestrate between services and models.
-- Services (`services/`) encapsulate business logic, called by controllers.
-- Repositories (`repositories/`) abstract data access, use connection pools.
+- Controllers (`controlador/`) orchestrate between services and models. **Controllers must use the Singleton pattern.**
+- Services (`services/`) encapsulate business logic, called by controllers. **Services must use the Singleton pattern.**
+- Repositories (`repositories/`) abstract data access, use connection pools. **Repositories must use the Singleton pattern.**
 - Models (`modelo/`) are POJOs with minimal logic.
 - Menu system (`menus/`) is modular, each menu in its own class.
 - Exception handling: custom exceptions in `exceptions/`.

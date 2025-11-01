@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import controlador.SensorController;
 import controlador.UsuarioController;
 import modelo.EstadoUsuario;
 import modelo.Usuario;
@@ -12,15 +13,24 @@ public class MenuPrincipal implements Menu {
 
     private final UsuarioController usuarioController;
     private final List<MenuOption> options = new ArrayList<>();
+    private final SensorController sensorController;
     private final Scanner scanner;
     private boolean salir = false;
 
     public MenuPrincipal(UsuarioController usuarioController, Scanner scanner) {
         this.usuarioController = usuarioController;
         this.scanner = scanner;
-        options.add(new MenuOption("Iniciar sesión", this::iniciarSesion));
-        options.add(new MenuOption("Crear usuario", this::crearUsuario));
-        options.add(new MenuOption("Salir", this::salir));
+        this.sensorController = SensorController.getInstance();
+    options.add(new MenuOption("Iniciar sesión", this::iniciarSesion));
+    options.add(new MenuOption("Crear usuario", this::crearUsuario));
+    options.add(new MenuOption("Menú de sensores", this::menuSensores));
+    options.add(new MenuOption("Salir", this::salir));
+    
+
+}
+
+private void menuSensores() {
+        new MenuSensor(sensorController, scanner).show();
     }
 
     private void iniciarSesion() {
@@ -75,7 +85,7 @@ public class MenuPrincipal implements Menu {
     }
 
     @Override
-    public void show() {
+public void show() {
         if (usuarioController.obtenerTodosLosUsuarios().isEmpty()) {
             System.out.println("No hay usuarios registrados.\n");
         }

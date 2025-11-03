@@ -11,8 +11,13 @@ public class MedicionesPorZona {
     public int mes;
     public Date fecha;
     public double valor;
+    public String nombre;
+    public Double latitud;
+    public Double longitud;
+    public String ciudad;
+    public String pais;
 
-    public MedicionesPorZona(String idSensor, String tipo, String zona, int anio, int mes, Date fecha, double valor) {
+    public MedicionesPorZona(String idSensor, String tipo, String zona, int anio, int mes, Date fecha, double valor, String nombre, Double latitud, Double longitud, String ciudad, String pais) {
         this.idSensor = idSensor;
         this.tipo = tipo;
         this.zona = zona;
@@ -20,10 +25,16 @@ public class MedicionesPorZona {
         this.mes = mes;
         this.fecha = fecha;
         this.valor = valor;
+        this.nombre = nombre;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.ciudad = ciudad;
+        this.pais = pais;
     }
 
     public MedicionesPorZona() {
     }
+
     @Override
     public String toString() {
         String fechaUtc = "";
@@ -32,12 +43,12 @@ public class MedicionesPorZona {
             sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
             fechaUtc = sdf.format(fecha);
         }
-        return "Medición Zona: " + zona +
-                ", Sensor: " + idSensor +
-                ", Tipo: " + tipo +
-                ", Fecha UTC: " + fechaUtc +
-                ", Año: " + anio +
-                ", Mes: " + mes +
-                ", Valor: " + valor;
+        return "Medición Zona: " + zona
+                + ", Sensor: " + idSensor
+                + ", Tipo: " + tipo
+                + ", Fecha UTC: " + fechaUtc
+                + ", Año: " + anio
+                + ", Mes: " + mes
+                + ", Valor: " + valor;
     }
 }

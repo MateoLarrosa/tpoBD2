@@ -8,7 +8,6 @@ import modelo.Usuario;
 
 public class MenuUsuario implements Menu {
 
-
     private final Usuario usuario;
     private final List<MenuOption> options = new ArrayList<>();
     private final Scanner scanner;
@@ -42,14 +41,13 @@ public class MenuUsuario implements Menu {
         System.out.println("Sesión cerrada.\n");
     }
 
-
     @Override
     public void show() {
         boolean continuar = true;
         while (continuar) {
             ConsolaUtils.limpiarConsola();
             ConsolaUtils.mostrarTitulo("MENÚ DE USUARIO");
-            java.util.List<String> opcionesMenu = new java.util.ArrayList<>();
+            List<String> opcionesMenu = new ArrayList<>();
             for (MenuOption option : options) {
                 opcionesMenu.add(option.getTitle());
             }

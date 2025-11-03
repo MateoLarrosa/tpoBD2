@@ -1,5 +1,8 @@
 package menus;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -36,16 +39,20 @@ public class MenuMediciones implements Menu {
         Sensor sensorSeleccionado = sensores.get(idx);
 
         String tipo = sensorSeleccionado.getTipo() != null ? sensorSeleccionado.getTipo().toString() : "";
-        System.out.print("Año: ");
-        System.out.print("Fecha (YYYY-MM-DD): ");
+        System.out.print("Fecha (dd/MM/yyyy): ");
         String fechaStr = scanner.nextLine();
         int anio, mes;
         try {
-            java.time.LocalDate localDate = java.time.LocalDate.parse(fechaStr);
-            anio = localDate.getYear();
-            mes = localDate.getMonthValue();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            sdf.setLenient(false);
+            Date fecha = sdf.parse(fechaStr);
+            // Extraer año y mes
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(fecha);
+            anio = cal.get(Calendar.YEAR);
+            mes = cal.get(Calendar.MONTH) + 1;
         } catch (Exception e) {
-            System.out.println("Formato de fecha inválido. Use YYYY-MM-DD.");
+            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy");
             return;
         }
         System.out.print("Valor: ");

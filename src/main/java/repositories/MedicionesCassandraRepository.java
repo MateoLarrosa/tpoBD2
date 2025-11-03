@@ -50,7 +50,12 @@ public class MedicionesCassandraRepository {
                             row.getInt("anio"),
                             row.getInt("mes"),
                             fecha,
-                            row.getDouble("valor")
+                            row.getDouble("valor"),
+                            row.getString("nombre"),
+                            row.getDouble("latitud"),
+                            row.getDouble("longitud"),
+                            row.getString("ciudad"),
+                            row.getString("pais")
                     );
                     result.add(m);
                 }
@@ -86,7 +91,12 @@ public class MedicionesCassandraRepository {
                             row.getInt("anio"),
                             row.getInt("mes"),
                             fecha,
-                            row.getDouble("valor")
+                            row.getDouble("valor"),
+                            row.getString("nombre"),
+                            row.getDouble("latitud"),
+                            row.getDouble("longitud"),
+                            row.getString("ciudad"),
+                            row.getString("zona")
                     );
                     result.add(m);
                 }
@@ -122,7 +132,12 @@ public class MedicionesCassandraRepository {
                             row.getInt("anio"),
                             row.getInt("mes"),
                             fecha,
-                            row.getDouble("valor")
+                            row.getDouble("valor"),
+                            row.getString("nombre"),
+                            row.getDouble("latitud"),
+                            row.getDouble("longitud"),
+                            row.getString("pais"),
+                            row.getString("zona")
                     );
                     result.add(m);
                 }
@@ -133,7 +148,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorZona> findAllZona() {
         List<MedicionesPorZona> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT zona, tipo, anio, mes, fecha, idSensor, valor FROM mediciones_por_zona");
+        ResultSet rs = session.execute("SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM mediciones_por_zona");
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -144,7 +159,12 @@ public class MedicionesCassandraRepository {
                     row.getInt("anio"),
                     row.getInt("mes"),
                     fecha,
-                    row.getDouble("valor")
+                    row.getDouble("valor"),
+                    row.getString("nombre"),
+                    row.getDouble("latitud"),
+                    row.getDouble("longitud"),
+                    row.getString("ciudad"),
+                    row.getString("pais")
             );
             result.add(m);
         }
@@ -153,7 +173,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorPais> findAllPais() {
         List<MedicionesPorPais> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT pais, tipo, anio, mes, fecha, idSensor, valor FROM mediciones_por_pais");
+        ResultSet rs = session.execute("SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM mediciones_por_pais");
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -164,7 +184,12 @@ public class MedicionesCassandraRepository {
                     row.getInt("anio"),
                     row.getInt("mes"),
                     fecha,
-                    row.getDouble("valor")
+                    row.getDouble("valor"),
+                    row.getString("nombre"),
+                    row.getDouble("latitud"),
+                    row.getDouble("longitud"),
+                    row.getString("ciudad"),
+                    row.getString("zona")
             );
             result.add(m);
         }
@@ -173,7 +198,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorCiudad> findAllCiudad() {
         List<MedicionesPorCiudad> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT ciudad, tipo, anio, mes, fecha, idSensor, valor FROM mediciones_por_ciudad");
+        ResultSet rs = session.execute("SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM mediciones_por_ciudad");
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -184,7 +209,12 @@ public class MedicionesCassandraRepository {
                     row.getInt("anio"),
                     row.getInt("mes"),
                     fecha,
-                    row.getDouble("valor")
+                    row.getDouble("valor"),
+                    row.getString("nombre"),
+                    row.getDouble("latitud"),
+                    row.getDouble("longitud"),
+                    row.getString("pais"),
+                    row.getString("zona")
             );
             result.add(m);
         }
@@ -229,6 +259,11 @@ public class MedicionesCassandraRepository {
                 + "mes int, "
                 + "fecha timestamp, "
                 + "idSensor text, "
+                + "nombre text, "
+                + "latitud double, "
+                + "longitud double, "
+                + "ciudad text, "
+                + "pais text, "
                 + "valor double, "
                 + "PRIMARY KEY ((zona, tipo, anio, mes), fecha, idSensor)"
                 + ") WITH CLUSTERING ORDER BY (fecha ASC);");
@@ -240,6 +275,11 @@ public class MedicionesCassandraRepository {
                 + "mes int, "
                 + "fecha timestamp, "
                 + "idSensor text, "
+                + "nombre text, "
+                + "latitud double, "
+                + "longitud double, "
+                + "ciudad text, "
+                + "zona text, "
                 + "valor double, "
                 + "PRIMARY KEY ((pais, tipo, anio, mes), fecha, idSensor)"
                 + ") WITH CLUSTERING ORDER BY (fecha ASC);");
@@ -251,6 +291,11 @@ public class MedicionesCassandraRepository {
                 + "mes int, "
                 + "fecha timestamp, "
                 + "idSensor text, "
+                + "nombre text, "
+                + "latitud double, "
+                + "longitud double, "
+                + "pais text, "
+                + "zona text, "
                 + "valor double, "
                 + "PRIMARY KEY ((ciudad, tipo, anio, mes), fecha, idSensor)"
                 + ") WITH CLUSTERING ORDER BY (fecha ASC);");

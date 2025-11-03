@@ -1,6 +1,6 @@
-
 package menus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +14,7 @@ import modelo.Mensaje;
 import modelo.Usuario;
 
 public class MenuChat implements Menu {
+
     private final Usuario usuario;
     private final Scanner scanner;
     private boolean salir = false;
@@ -28,9 +29,9 @@ public class MenuChat implements Menu {
         while (!salir) {
             ConsolaUtils.limpiarConsola();
             ConsolaUtils.mostrarTitulo("UADE Chat");
-            java.util.List<String> opcionesMenu = java.util.Arrays.asList(
-                "Ver chats / Crear chat",
-                "Volver al menú principal"
+            List<String> opcionesMenu = java.util.Arrays.asList(
+                    "Ver chats / Crear chat",
+                    "Volver al menú principal"
             );
             ConsolaUtils.mostrarOpciones(opcionesMenu);
             System.out.print("Seleccione una opción: ");
@@ -68,9 +69,9 @@ public class MenuChat implements Menu {
                 }
             }
             ConsolaUtils.mostrarTitulo("Tus chats");
-            java.util.List<String> opcionesChats = new java.util.ArrayList<>();
+            List<String> opcionesChats = new ArrayList<>();
             opcionesChats.add("Crear chat nuevo");
-            List<String> chatIds = new java.util.ArrayList<>(chats);
+            List<String> chatIds = new ArrayList<>(chats);
             for (String id : chatIds) {
                 Usuario otro = idToUsuario.get(id);
                 opcionesChats.add(otro.getNombre() + " (" + otro.getEmail() + ")");
@@ -98,7 +99,7 @@ public class MenuChat implements Menu {
 
     private void crearChatNuevo(List<Usuario> usuarios, Set<String> chats) {
         ConsolaUtils.limpiarConsola();
-        List<Usuario> disponibles = new java.util.ArrayList<>();
+        List<Usuario> disponibles = new ArrayList<>();
         for (Usuario u : usuarios) {
             if (!u.getId().equals(usuario.getId()) && !chats.contains(u.getId())) {
                 disponibles.add(u);
@@ -109,7 +110,7 @@ public class MenuChat implements Menu {
             return;
         }
         ConsolaUtils.mostrarTitulo("Usuarios disponibles para chatear");
-        java.util.List<String> opcionesUsuarios = new java.util.ArrayList<>();
+        List<String> opcionesUsuarios = new ArrayList<>();
         for (Usuario u : disponibles) {
             opcionesUsuarios.add(u.getNombre() + " (" + u.getEmail() + ")");
         }

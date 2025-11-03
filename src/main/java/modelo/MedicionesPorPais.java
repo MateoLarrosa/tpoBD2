@@ -11,8 +11,13 @@ public class MedicionesPorPais {
     public int mes;
     public Date fecha;
     public double valor;
+    public String nombre;
+    public Double latitud;
+    public Double longitud;
+    public String ciudad;
+    public String zona;
 
-    public MedicionesPorPais(String idSensor, String tipo, String pais, int anio, int mes, Date fecha, double valor) {
+    public MedicionesPorPais(String idSensor, String tipo, String pais, int anio, int mes, Date fecha, double valor, String nombre, Double latitud, Double longitud, String ciudad, String zona) {
         this.idSensor = idSensor;
         this.tipo = tipo;
         this.pais = pais;
@@ -20,6 +25,11 @@ public class MedicionesPorPais {
         this.mes = mes;
         this.fecha = fecha;
         this.valor = valor;
+        this.nombre = nombre;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.ciudad = ciudad;
+        this.zona = zona;
     }
 
     public MedicionesPorPais() {

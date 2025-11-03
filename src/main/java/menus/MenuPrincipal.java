@@ -21,15 +21,14 @@ public class MenuPrincipal implements Menu {
         this.usuarioController = usuarioController;
         this.scanner = scanner;
         this.sensorController = SensorController.getInstance();
-    options.add(new MenuOption("Iniciar sesión", this::iniciarSesion));
-    options.add(new MenuOption("Crear usuario", this::crearUsuario));
-    options.add(new MenuOption("Menú de sensores", this::menuSensores));
-    options.add(new MenuOption("Salir", this::salir));
-    
+        options.add(new MenuOption("Iniciar sesión", this::iniciarSesion));
+        options.add(new MenuOption("Crear usuario", this::crearUsuario));
+        options.add(new MenuOption("Menú de sensores", this::menuSensores));
+        options.add(new MenuOption("Salir", this::salir));
 
-}
+    }
 
-private void menuSensores() {
+    private void menuSensores() {
         new MenuSensor(sensorController, scanner).show();
     }
 
@@ -85,14 +84,14 @@ private void menuSensores() {
     }
 
     @Override
-public void show() {
+    public void show() {
         if (usuarioController.obtenerTodosLosUsuarios().isEmpty()) {
             System.out.println("No hay usuarios registrados.\n");
         }
         while (!salir) {
             ConsolaUtils.limpiarConsola();
             ConsolaUtils.mostrarTitulo("MENÚ PRINCIPAL");
-            java.util.List<String> opcionesMenu = new java.util.ArrayList<>();
+            List<String> opcionesMenu = new ArrayList<>();
             for (MenuOption option : options) {
                 opcionesMenu.add(option.getTitle());
             }

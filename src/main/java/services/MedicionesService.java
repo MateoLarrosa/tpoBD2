@@ -77,34 +77,35 @@ public class MedicionesService {
      */
     public void registrarMedicion(Sensor sensor, String tipo, int anio, int mes, String fecha, double valor) {
         // Usar los datos del sensor para las ubicaciones
-    String zona = sensor.getZona();
-    String pais = sensor.getPais();
-    String ciudad = sensor.getCiudad();
-    String sensorId = sensor.getId();
-    String nombre = sensor.getNombre();
-    Double latitud = sensor.getLatitud();
-    Double longitud = sensor.getLongitud();
+        String zona = (sensor.getZona() != null && !sensor.getZona().isBlank()) ? sensor.getZona() : null;
+        String pais = (sensor.getPais() != null && !sensor.getPais().isBlank()) ? sensor.getPais() : null;
+        String ciudad = (sensor.getCiudad() != null && !sensor.getCiudad().isBlank()) ? sensor.getCiudad() : null;
+        String sensorId = sensor.getId();
+        String nombre = (sensor.getNombre() != null && !sensor.getNombre().isBlank()) ? sensor.getNombre() : null;
+        Double latitud = (sensor.getLatitud() != 0.0) ? sensor.getLatitud() : null;
+        Double longitud = (sensor.getLongitud() != 0.0) ? sensor.getLongitud() : null;
 
-    // Convertir String fecha a java.util.Date usando LocalDate (YYYY-MM-DD)
-    Date fechaDate = null;
-    if (fecha != null && !fecha.isBlank()) {
-        try {
-        java.time.LocalDate localDate = java.time.LocalDate.parse(fecha);
-        fechaDate = Date.from(localDate.atStartOfDay(java.time.ZoneOffset.UTC).toInstant());
-        } catch (Exception e) {
-        // Manejo simple: dejar fechaDate en null si falla el parseo
+        // Convertir String fecha a java.util.Date usando formato dd/MM/yyyy
+        Date fechaDate = null;
+        if (fecha != null && !fecha.isBlank()) {
+            try {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                sdf.setLenient(false);
+                fechaDate = sdf.parse(fecha);
+            } catch (Exception e) {
+                // Manejo simple: dejar fechaDate en null si falla el parseo
+            }
         }
-    }
 
-    MedicionesPorZona mz = (zona == null || zona.isBlank()) ? null
-        : new MedicionesPorZona(sensorId, tipo, zona, anio, mes, fechaDate, valor, nombre, latitud, longitud, ciudad, pais);
+        MedicionesPorZona mz = (zona == null || zona.isBlank()) ? null
+                : new MedicionesPorZona(sensorId, tipo, zona, anio, mes, fechaDate, valor, nombre, latitud, longitud, ciudad, pais);
 
-    MedicionesPorPais mp = (pais == null || pais.isBlank()) ? null
-        : new MedicionesPorPais(sensorId, tipo, pais, anio, mes, fechaDate, valor, nombre, latitud, longitud, ciudad, zona);
+        MedicionesPorPais mp = (pais == null || pais.isBlank()) ? null
+                : new MedicionesPorPais(sensorId, tipo, pais, anio, mes, fechaDate, valor, nombre, latitud, longitud, ciudad, zona);
 
-    MedicionesPorCiudad mc = (ciudad == null || ciudad.isBlank()) ? null
-        : new MedicionesPorCiudad(sensorId, tipo, ciudad, anio, mes, fechaDate, valor, nombre, latitud, longitud, pais, zona);
+        MedicionesPorCiudad mc = (ciudad == null || ciudad.isBlank()) ? null
+                : new MedicionesPorCiudad(sensorId, tipo, ciudad, anio, mes, fechaDate, valor, nombre, latitud, longitud, pais, zona);
 
-    getCassandraRepo().insertTrio(mz, mp, mc);
+        getCassandraRepo().insertTrio(mz, mp, mc);
     }
 }

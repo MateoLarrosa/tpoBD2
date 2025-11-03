@@ -15,12 +15,13 @@ import modelo.TipoSensor;
 
 public class SensorRepository implements IRepository<Sensor> {
 
+    private static final String COLLECTION_NAME = "sensores";
     private static SensorRepository instance;
     private final MongoCollection<Document> collection;
 
     private SensorRepository() {
         MongoDatabase db = MongoConnectionManager.getInstance().getDatabase();
-        this.collection = db.getCollection("sensores");
+        this.collection = db.getCollection(COLLECTION_NAME);
     }
 
     public static SensorRepository getInstance() {

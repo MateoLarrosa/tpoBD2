@@ -18,6 +18,7 @@ import redis.clients.jedis.resps.StreamEntry;
 
 public class RedisMessageRepository {
 
+    private static final String KEY_PREFIX = "chat:";
     private final RedisPool pool;
     private static RedisMessageRepository instance;
 
@@ -36,14 +37,16 @@ public class RedisMessageRepository {
         return pool.execute(jedis -> {
             Map<String, String> fields = new HashMap<>();
             fields.put("mensaje", contenido);
-            StreamEntryID id = jedis.xadd(chatKey, XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY), fields);
+            String key = KEY_PREFIX + chatKey;
+            StreamEntryID id = jedis.xadd(key, XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY), fields);
             return id.toString();
         });
     }
 
     public List<Mensaje> getLastMessages(String chatKey, int count) throws ErrorConectionMongoException {
         return pool.execute(jedis -> {
-            List<StreamEntry> entries = jedis.xrevrange(chatKey, "+", "-", count);
+            String key = KEY_PREFIX + chatKey;
+            List<StreamEntry> entries = jedis.xrevrange(key, "+", "-", count);
             return entries.stream()
                     .map(e -> Mensaje.fromStreamEntry(chatKey, e.getID().toString(), e.getFields()))
                     .collect(Collectors.toList());
@@ -53,7 +56,8 @@ public class RedisMessageRepository {
     public void ensureConsumerGroup(String chatKey, String groupName) throws ErrorConectionMongoException {
         pool.execute((Jedis jedis) -> {
             try {
-                jedis.xgroupCreate(chatKey, groupName, StreamEntryID.LAST_ENTRY, true);
+                String key = KEY_PREFIX + chatKey;
+                jedis.xgroupCreate(key, groupName, StreamEntryID.LAST_ENTRY, true);
             } catch (Exception ignored) {
             }
             return null;
@@ -61,14 +65,14 @@ public class RedisMessageRepository {
     }
 
     public List<Mensaje> readNewMessages(String chatKey, String groupName, String consumer, int count, int blockMs) throws ErrorConectionMongoException {
-
         return pool.execute(jedis -> {
+            String key = KEY_PREFIX + chatKey;
             XReadGroupParams params = XReadGroupParams.xReadGroupParams()
                     .count(count)
                     .block(blockMs);  // <- int
 
             Map<String, StreamEntryID> streams
-                    = Collections.singletonMap(chatKey, StreamEntryID.UNRECEIVED_ENTRY);
+                    = Collections.singletonMap(key, StreamEntryID.UNRECEIVED_ENTRY);
 
             List<Map.Entry<String, List<redis.clients.jedis.resps.StreamEntry>>> result
                     = jedis.xreadGroup(groupName, consumer, params, streams);
@@ -92,6 +96,7 @@ public class RedisMessageRepository {
     }
 
     public long ackMessages(String chatKey, String groupName, List<String> ids) throws ErrorConectionMongoException {
-        return pool.execute(jedis -> jedis.xack(chatKey, groupName, ids.stream().map(StreamEntryID::new).toArray(StreamEntryID[]::new)));
+        String key = KEY_PREFIX + chatKey;
+        return pool.execute(jedis -> jedis.xack(key, groupName, ids.stream().map(StreamEntryID::new).toArray(StreamEntryID[]::new)));
     }
 }

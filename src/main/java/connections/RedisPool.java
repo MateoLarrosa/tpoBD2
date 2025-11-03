@@ -28,12 +28,11 @@ public class RedisPool {
             poolConfig.setTestOnBorrow(true);
             poolConfig.setTestOnReturn(true);
 
-            
             if (redisUrl.startsWith("redis://")) {
                 URI redisUri = URI.create(redisUrl);
                 jedisPool = new JedisPool(poolConfig, redisUri);
             } else {
-                
+
                 String[] hostPort = redisUrl.split(":");
                 String host = hostPort[0];
                 int port = hostPort.length > 1 ? Integer.parseInt(hostPort[1]) : 6379;
@@ -54,7 +53,7 @@ public class RedisPool {
     public Jedis getConnection() throws ErrorConectionMongoException {
         try {
             Jedis jedis = jedisPool.getResource();
-            
+
             jedis.ping();
             return jedis;
         } catch (Exception e) {
@@ -74,7 +73,6 @@ public class RedisPool {
         }
     }
 
-    
     public <T> T execute(RedisOperation<T> operation) throws ErrorConectionMongoException {
         Jedis jedis = null;
         try {
@@ -84,7 +82,6 @@ public class RedisPool {
             returnConnection(jedis);
         }
     }
-
 
     @FunctionalInterface
     public interface RedisOperation<T> {

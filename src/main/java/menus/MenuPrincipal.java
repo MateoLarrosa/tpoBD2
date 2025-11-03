@@ -5,13 +5,18 @@ import java.util.List;
 import java.util.Scanner;
 
 import controlador.SensorController;
+import controlador.SesionController;
 import controlador.UsuarioController;
+import exceptions.ErrorConectionMongoException;
 import modelo.EstadoUsuario;
+import modelo.Sesion;
 import modelo.Usuario;
 
 public class MenuPrincipal implements Menu {
 
     private final UsuarioController usuarioController;
+    private final SesionController sesionController = SesionController.getInstance();
+    private String idSesionActual;
     private final List<MenuOption> options = new ArrayList<>();
     private final SensorController sensorController;
     private final Scanner scanner;
@@ -48,8 +53,14 @@ public class MenuPrincipal implements Menu {
             int idx = Integer.parseInt(scanner.nextLine()) - 1;
             if (idx >= 0 && idx < usuarios.size()) {
                 Usuario usuarioLogueado = usuarios.get(idx);
-                System.out.println("\nSesión iniciada como: " + usuarioLogueado.getNombre() + "\n");
-                new MenuUsuario(usuarioLogueado, scanner).show();
+                try {
+                    Sesion sesion = sesionController.iniciarSesion(usuarioLogueado.getId());
+                    idSesionActual = sesion.getIdSesion();
+                    System.out.println("\nSesión iniciada como: " + usuarioLogueado.getNombre() + " (ID Sesión: " + idSesionActual + ")\n");
+                    new MenuUsuario(usuarioLogueado, scanner, sesionController).show();
+                } catch (ErrorConectionMongoException e) {
+                    System.out.println("Error al iniciar sesión en Redis: " + e.getMessage());
+                }
             } else {
                 System.out.println("Selección inválida.\n");
             }

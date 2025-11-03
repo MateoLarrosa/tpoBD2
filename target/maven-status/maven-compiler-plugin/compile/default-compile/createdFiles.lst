@@ -1,3 +1,4 @@
+repositories/SesionRepository.class
 services/MedicionesService.class
 menus/ConsolaUtils.class
 modelo/EstadoFactura.class
@@ -9,6 +10,7 @@ modelo/Usuario.class
 modelo/Factura.class
 connections/RedisPool.class
 services/SensorService.class
+controlador/SesionController.class
 repositories/MongoConnectionManager.class
 repositories/UsuarioRepository.class
 repositories/SensorRepository.class
@@ -31,6 +33,7 @@ modelo/CuentaCorriente.class
 modelo/Proceso.class
 test/CassandraConnectionTest.class
 modelo/Pago.class
+services/SesionService.class
 main/Main.class
 exceptions/ErrorConectionMongoException.class
 controlador/MensajeriaController.class
@@ -43,6 +46,7 @@ connections/RedisPool$RedisOperation.class
 modelo/TipoSensor.class
 menus/MenuSensor.class
 controlador/SensorController.class
+modelo/Sesion.class
 modelo/AlertasActivasPorUbicacion.class
 menus/MenuOption.class
 menus/MenuChat.class

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import controlador.SesionController;
+import exceptions.ErrorConectionMongoException;
 import modelo.Usuario;
 
 public class MenuUsuario implements Menu {
@@ -11,10 +13,12 @@ public class MenuUsuario implements Menu {
     private final Usuario usuario;
     private final List<MenuOption> options = new ArrayList<>();
     private final Scanner scanner;
+    private final SesionController sesionController;
 
-    public MenuUsuario(Usuario usuario, Scanner scanner) {
+    public MenuUsuario(Usuario usuario, Scanner scanner, SesionController sesionController) {
         this.usuario = usuario;
         this.scanner = scanner;
+        this.sesionController = sesionController;
         options.add(new MenuOption("Ver perfil", this::verPerfil));
         options.add(new MenuOption("UADE Chat", this::abrirUadeChat));
         options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
@@ -38,7 +42,12 @@ public class MenuUsuario implements Menu {
     }
 
     private void cerrarSesion() {
-        System.out.println("Sesión cerrada.\n");
+        try {
+            sesionController.cerrarSesion();
+            System.out.println("Sesión cerrada y registrada en Redis.\n");
+        } catch (ErrorConectionMongoException e) {
+            System.out.println("Error al cerrar sesión en Redis: " + e.getMessage());
+        }
     }
 
     @Override

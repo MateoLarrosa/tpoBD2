@@ -23,6 +23,10 @@ import modelo.MedicionesPorZona;
 
 public class MedicionesCassandraRepository {
 
+    private static final String TABLE_ZONA = "mediciones_por_zona";
+    private static final String TABLE_PAIS = "mediciones_por_pais";
+    private static final String TABLE_CIUDAD = "mediciones_por_ciudad";
+
     public List<MedicionesPorZona> findByZonaYRangoFechas(String zona, String tipo, Date fechaInicio, Date fechaFin) {
         List<MedicionesPorZona> result = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
@@ -36,7 +40,7 @@ public class MedicionesCassandraRepository {
             int mesDesde = (anio == anioIni) ? mesIni : 1;
             int mesHasta = (anio == anioFin) ? mesFin : 12;
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
-                String query = "SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM mediciones_por_zona WHERE zona=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
+                String query = "SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM " + TABLE_ZONA + " WHERE zona=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
                 PreparedStatement ps = session.prepare(query);
                 BoundStatement bs = ps.bind(zona, tipo, anio, mes, fechaInicio.toInstant(), fechaFin.toInstant());
                 ResultSet rs = session.execute(bs);
@@ -77,7 +81,7 @@ public class MedicionesCassandraRepository {
             int mesDesde = (anio == anioIni) ? mesIni : 1;
             int mesHasta = (anio == anioFin) ? mesFin : 12;
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
-                String query = "SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM mediciones_por_pais WHERE pais=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
+                String query = "SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM " + TABLE_PAIS + " WHERE pais=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
                 PreparedStatement ps = session.prepare(query);
                 BoundStatement bs = ps.bind(pais, tipo, anio, mes, fechaInicio.toInstant(), fechaFin.toInstant());
                 ResultSet rs = session.execute(bs);
@@ -118,7 +122,7 @@ public class MedicionesCassandraRepository {
             int mesDesde = (anio == anioIni) ? mesIni : 1;
             int mesHasta = (anio == anioFin) ? mesFin : 12;
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
-                String query = "SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM mediciones_por_ciudad WHERE ciudad=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
+                String query = "SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM " + TABLE_CIUDAD + " WHERE ciudad=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
                 PreparedStatement ps = session.prepare(query);
                 BoundStatement bs = ps.bind(ciudad, tipo, anio, mes, fechaInicio.toInstant(), fechaFin.toInstant());
                 ResultSet rs = session.execute(bs);
@@ -148,7 +152,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorZona> findAllZona() {
         List<MedicionesPorZona> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM mediciones_por_zona");
+        ResultSet rs = session.execute("SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM " + TABLE_ZONA);
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -173,7 +177,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorPais> findAllPais() {
         List<MedicionesPorPais> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM mediciones_por_pais");
+        ResultSet rs = session.execute("SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM " + TABLE_PAIS);
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -198,7 +202,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorCiudad> findAllCiudad() {
         List<MedicionesPorCiudad> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM mediciones_por_ciudad");
+        ResultSet rs = session.execute("SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM " + TABLE_CIUDAD);
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -235,15 +239,15 @@ public class MedicionesCassandraRepository {
             crearTablasSiNoExisten();
 
             this.insertZonaPs = session.prepare(
-                    "INSERT INTO mediciones_por_zona (zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor) "
+                    "INSERT INTO " + TABLE_ZONA + " (zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             this.insertPaisPs = session.prepare(
-                    "INSERT INTO mediciones_por_pais (pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor) "
+                    "INSERT INTO " + TABLE_PAIS + " (pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             this.insertCiudadPs = session.prepare(
-                    "INSERT INTO mediciones_por_ciudad (ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor) "
+                    "INSERT INTO " + TABLE_CIUDAD + " (ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
         } catch (ErrorConectionMongoException e) {
@@ -252,7 +256,7 @@ public class MedicionesCassandraRepository {
     }
 
     private void crearTablasSiNoExisten() {
-        session.execute("CREATE TABLE IF NOT EXISTS mediciones_por_zona ("
+        session.execute("CREATE TABLE IF NOT EXISTS " + TABLE_ZONA + " ("
                 + "zona text, "
                 + "tipo text, "
                 + "anio int, "
@@ -268,7 +272,7 @@ public class MedicionesCassandraRepository {
                 + "PRIMARY KEY ((zona, tipo, anio, mes), fecha, idSensor)"
                 + ") WITH CLUSTERING ORDER BY (fecha ASC);");
 
-        session.execute("CREATE TABLE IF NOT EXISTS mediciones_por_pais ("
+        session.execute("CREATE TABLE IF NOT EXISTS " + TABLE_PAIS + " ("
                 + "pais text, "
                 + "tipo text, "
                 + "anio int, "
@@ -284,7 +288,7 @@ public class MedicionesCassandraRepository {
                 + "PRIMARY KEY ((pais, tipo, anio, mes), fecha, idSensor)"
                 + ") WITH CLUSTERING ORDER BY (fecha ASC);");
 
-        session.execute("CREATE TABLE IF NOT EXISTS mediciones_por_ciudad ("
+        session.execute("CREATE TABLE IF NOT EXISTS " + TABLE_CIUDAD + " ("
                 + "ciudad text, "
                 + "tipo text, "
                 + "anio int, "

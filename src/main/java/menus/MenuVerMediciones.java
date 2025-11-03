@@ -1,7 +1,12 @@
 package menus;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import controlador.SensorController;
 import modelo.MedicionesPorCiudad;
@@ -53,16 +58,18 @@ public class MenuVerMediciones implements Menu {
     }
 
     private void verMedicionesZona() {
-        List<MedicionesPorZona> mediciones = MedicionesCassandraRepository.getInstance().findAllZona();
-        if (mediciones.isEmpty()) {
+        // Obtener zonas únicas (de todas las mediciones)
+        List<MedicionesPorZona> todas = MedicionesCassandraRepository.getInstance().findAllZona();
+        if (todas.isEmpty()) {
             System.out.println("No hay mediciones por zona registradas.");
             esperarConfirmacion();
             return;
         }
-        // Obtener zonas únicas
-        java.util.Set<String> zonas = new java.util.HashSet<>();
-        for (MedicionesPorZona m : mediciones) {
+        Set<String> zonas = new HashSet<>();
+        Set<String> tipos = new HashSet<>();
+        for (MedicionesPorZona m : todas) {
             zonas.add(m.zona);
+            tipos.add(m.tipo);
         }
         if (zonas.isEmpty()) {
             System.out.println("No hay zonas disponibles.");
@@ -70,7 +77,7 @@ public class MenuVerMediciones implements Menu {
             return;
         }
         System.out.println("Zonas disponibles:");
-        java.util.List<String> zonasList = new java.util.ArrayList<>(zonas);
+        List<String> zonasList = new ArrayList<>(zonas);
         for (int i = 0; i < zonasList.size(); i++) {
             System.out.println((i + 1) + ". " + zonasList.get(i));
         }
@@ -89,9 +96,58 @@ public class MenuVerMediciones implements Menu {
             return;
         }
         String zonaSeleccionada = zonasList.get(seleccion - 1);
-        System.out.println("--- Mediciones para zona: " + zonaSeleccionada + " ---");
-        for (MedicionesPorZona m : mediciones) {
-            if (m.zona.equals(zonaSeleccionada)) {
+
+        // Selección de tipo (opcional, si hay más de uno)
+        String tipoSeleccionado = null;
+        if (tipos.size() > 1) {
+            System.out.println("Tipos disponibles:");
+            List<String> tiposList = new ArrayList<>(tipos);
+            for (int i = 0; i < tiposList.size(); i++) {
+                System.out.println((i + 1) + ". " + tiposList.get(i));
+            }
+            System.out.print("Seleccione un tipo: ");
+            int selTipo = -1;
+            try {
+                selTipo = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Selección inválida.");
+                esperarConfirmacion();
+                return;
+            }
+            if (selTipo < 1 || selTipo > tiposList.size()) {
+                System.out.println("Selección fuera de rango.");
+                esperarConfirmacion();
+                return;
+            }
+            tipoSeleccionado = tiposList.get(selTipo - 1);
+        } else if (!tipos.isEmpty()) {
+            tipoSeleccionado = tipos.iterator().next();
+        }
+
+        // Pedir rango de fechas
+        System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
+        String fechaInicioStr = scanner.nextLine();
+        System.out.print("Ingrese fecha de fin (dd/MM/yyyy): ");
+        String fechaFinStr = scanner.nextLine();
+        Date fechaInicio = null;
+        Date fechaFin = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            fechaInicio = sdf.parse(fechaInicioStr);
+            fechaFin = sdf.parse(fechaFinStr);
+        } catch (Exception e) {
+            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy");
+            esperarConfirmacion();
+            return;
+        }
+
+        // Usar repo para filtrar por rango y zona
+        List<MedicionesPorZona> mediciones = MedicionesCassandraRepository.getInstance().findByZonaYRangoFechas(zonaSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
+        System.out.println("--- Mediciones para zona: " + zonaSeleccionada + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
+        if (mediciones.isEmpty()) {
+            System.out.println("No hay mediciones en ese rango.");
+        } else {
+            for (MedicionesPorZona m : mediciones) {
                 System.out.println(m);
             }
         }
@@ -99,16 +155,18 @@ public class MenuVerMediciones implements Menu {
     }
 
     private void verMedicionesPais() {
-        List<MedicionesPorPais> mediciones = MedicionesCassandraRepository.getInstance().findAllPais();
-        if (mediciones.isEmpty()) {
+        // Obtener países únicos (de todas las mediciones)
+        List<MedicionesPorPais> todas = MedicionesCassandraRepository.getInstance().findAllPais();
+        if (todas.isEmpty()) {
             System.out.println("No hay mediciones por país registradas.");
             esperarConfirmacion();
             return;
         }
-        // Obtener países únicos
-        java.util.Set<String> paises = new java.util.HashSet<>();
-        for (MedicionesPorPais m : mediciones) {
+        Set<String> paises = new HashSet<>();
+        Set<String> tipos = new HashSet<>();
+        for (MedicionesPorPais m : todas) {
             paises.add(m.pais);
+            tipos.add(m.tipo);
         }
         if (paises.isEmpty()) {
             System.out.println("No hay países disponibles.");
@@ -116,7 +174,7 @@ public class MenuVerMediciones implements Menu {
             return;
         }
         System.out.println("Países disponibles:");
-        java.util.List<String> paisesList = new java.util.ArrayList<>(paises);
+        List<String> paisesList = new ArrayList<>(paises);
         for (int i = 0; i < paisesList.size(); i++) {
             System.out.println((i + 1) + ". " + paisesList.get(i));
         }
@@ -135,9 +193,58 @@ public class MenuVerMediciones implements Menu {
             return;
         }
         String paisSeleccionado = paisesList.get(seleccion - 1);
-        System.out.println("--- Mediciones para país: " + paisSeleccionado + " ---");
-        for (MedicionesPorPais m : mediciones) {
-            if (m.pais.equals(paisSeleccionado)) {
+
+        // Selección de tipo (opcional, si hay más de uno)
+        String tipoSeleccionado = null;
+        if (tipos.size() > 1) {
+            System.out.println("Tipos disponibles:");
+            List<String> tiposList = new ArrayList<>(tipos);
+            for (int i = 0; i < tiposList.size(); i++) {
+                System.out.println((i + 1) + ". " + tiposList.get(i));
+            }
+            System.out.print("Seleccione un tipo: ");
+            int selTipo = -1;
+            try {
+                selTipo = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Selección inválida.");
+                esperarConfirmacion();
+                return;
+            }
+            if (selTipo < 1 || selTipo > tiposList.size()) {
+                System.out.println("Selección fuera de rango.");
+                esperarConfirmacion();
+                return;
+            }
+            tipoSeleccionado = tiposList.get(selTipo - 1);
+        } else if (!tipos.isEmpty()) {
+            tipoSeleccionado = tipos.iterator().next();
+        }
+
+        // Pedir rango de fechas
+        System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
+        String fechaInicioStr = scanner.nextLine();
+        System.out.print("Ingrese fecha de fin (dd/MM/yyyy): ");
+        String fechaFinStr = scanner.nextLine();
+        Date fechaInicio = null;
+        Date fechaFin = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            fechaInicio = sdf.parse(fechaInicioStr);
+            fechaFin = sdf.parse(fechaFinStr);
+        } catch (Exception e) {
+            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy");
+            esperarConfirmacion();
+            return;
+        }
+
+        // Usar repo para filtrar por rango y país
+        List<MedicionesPorPais> mediciones = MedicionesCassandraRepository.getInstance().findByPaisYRangoFechas(paisSeleccionado, tipoSeleccionado, fechaInicio, fechaFin);
+        System.out.println("--- Mediciones para país: " + paisSeleccionado + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
+        if (mediciones.isEmpty()) {
+            System.out.println("No hay mediciones en ese rango.");
+        } else {
+            for (MedicionesPorPais m : mediciones) {
                 System.out.println(m);
             }
         }
@@ -145,16 +252,18 @@ public class MenuVerMediciones implements Menu {
     }
 
     private void verMedicionesCiudad() {
-        List<MedicionesPorCiudad> mediciones = MedicionesCassandraRepository.getInstance().findAllCiudad();
-        if (mediciones.isEmpty()) {
+        // Obtener ciudades únicas (de todas las mediciones)
+        List<MedicionesPorCiudad> todas = MedicionesCassandraRepository.getInstance().findAllCiudad();
+        if (todas.isEmpty()) {
             System.out.println("No hay mediciones por ciudad registradas.");
             esperarConfirmacion();
             return;
         }
-        // Obtener ciudades únicas
-        java.util.Set<String> ciudades = new java.util.HashSet<>();
-        for (MedicionesPorCiudad m : mediciones) {
+        Set<String> ciudades = new HashSet<>();
+        Set<String> tipos = new HashSet<>();
+        for (MedicionesPorCiudad m : todas) {
             ciudades.add(m.ciudad);
+            tipos.add(m.tipo);
         }
         if (ciudades.isEmpty()) {
             System.out.println("No hay ciudades disponibles.");
@@ -162,7 +271,7 @@ public class MenuVerMediciones implements Menu {
             return;
         }
         System.out.println("Ciudades disponibles:");
-        java.util.List<String> ciudadesList = new java.util.ArrayList<>(ciudades);
+        List<String> ciudadesList = new ArrayList<>(ciudades);
         for (int i = 0; i < ciudadesList.size(); i++) {
             System.out.println((i + 1) + ". " + ciudadesList.get(i));
         }
@@ -181,9 +290,58 @@ public class MenuVerMediciones implements Menu {
             return;
         }
         String ciudadSeleccionada = ciudadesList.get(seleccion - 1);
-        System.out.println("--- Mediciones para ciudad: " + ciudadSeleccionada + " ---");
-        for (MedicionesPorCiudad m : mediciones) {
-            if (m.ciudad.equals(ciudadSeleccionada)) {
+
+        // Selección de tipo (opcional, si hay más de uno)
+        String tipoSeleccionado = null;
+        if (tipos.size() > 1) {
+            System.out.println("Tipos disponibles:");
+            List<String> tiposList = new ArrayList<>(tipos);
+            for (int i = 0; i < tiposList.size(); i++) {
+                System.out.println((i + 1) + ". " + tiposList.get(i));
+            }
+            System.out.print("Seleccione un tipo: ");
+            int selTipo = -1;
+            try {
+                selTipo = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Selección inválida.");
+                esperarConfirmacion();
+                return;
+            }
+            if (selTipo < 1 || selTipo > tiposList.size()) {
+                System.out.println("Selección fuera de rango.");
+                esperarConfirmacion();
+                return;
+            }
+            tipoSeleccionado = tiposList.get(selTipo - 1);
+        } else if (!tipos.isEmpty()) {
+            tipoSeleccionado = tipos.iterator().next();
+        }
+
+        // Pedir rango de fechas
+        System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
+        String fechaInicioStr = scanner.nextLine();
+        System.out.print("Ingrese fecha de fin (dd/MM/yyyy): ");
+        String fechaFinStr = scanner.nextLine();
+        Date fechaInicio = null;
+        Date fechaFin = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            fechaInicio = sdf.parse(fechaInicioStr);
+            fechaFin = sdf.parse(fechaFinStr);
+        } catch (Exception e) {
+            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy");
+            esperarConfirmacion();
+            return;
+        }
+
+        // Usar repo para filtrar por rango y ciudad
+        List<MedicionesPorCiudad> mediciones = MedicionesCassandraRepository.getInstance().findByCiudadYRangoFechas(ciudadSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
+        System.out.println("--- Mediciones para ciudad: " + ciudadSeleccionada + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
+        if (mediciones.isEmpty()) {
+            System.out.println("No hay mediciones en ese rango.");
+        } else {
+            for (MedicionesPorCiudad m : mediciones) {
                 System.out.println(m);
             }
         }

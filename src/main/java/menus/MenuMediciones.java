@@ -37,15 +37,14 @@ public class MenuMediciones implements Menu {
 
         String tipo = sensorSeleccionado.getTipo() != null ? sensorSeleccionado.getTipo().toString() : "";
         System.out.print("Año: ");
-        int anio = ConsolaUtils.leerEntero(scanner);
-        System.out.print("Mes: ");
-        int mes = ConsolaUtils.leerEntero(scanner);
         System.out.print("Fecha (YYYY-MM-DD): ");
         String fechaStr = scanner.nextLine();
-        // Validar formato simple, pero pasar como String
+        int anio, mes;
         try {
-            java.sql.Date.valueOf(fechaStr);
-        } catch (IllegalArgumentException e) {
+            java.time.LocalDate localDate = java.time.LocalDate.parse(fechaStr);
+            anio = localDate.getYear();
+            mes = localDate.getMonthValue();
+        } catch (Exception e) {
             System.out.println("Formato de fecha inválido. Use YYYY-MM-DD.");
             return;
         }

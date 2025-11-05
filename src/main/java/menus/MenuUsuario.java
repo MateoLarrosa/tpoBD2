@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import controlador.SensorController;
 import controlador.SesionController;
 import exceptions.ErrorConectionMongoException;
 import modelo.Usuario;
@@ -20,8 +21,25 @@ public class MenuUsuario implements Menu {
         this.scanner = scanner;
         this.sesionController = sesionController;
         options.add(new MenuOption("Ver perfil", this::verPerfil));
+        options.add(new MenuOption("Consultar mediciones", this::menuMediciones));
+        options.add(new MenuOption("Mis procesos y solicitudes", this::menuProcesos));
+        options.add(new MenuOption("Mis facturas y pagos", this::menuFacturacion));
         options.add(new MenuOption("UADE Chat", this::abrirUadeChat));
         options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
+    }
+
+    private void menuMediciones() {
+        MenuVerMediciones menu = new MenuVerMediciones(SensorController.getInstance(), scanner);
+        menu.setUsuarioId(usuario.getId());
+        menu.show();
+    }
+
+    private void menuProcesos() {
+        new MenuProcesos(scanner).mostrar(usuario.getId());
+    }
+
+    private void menuFacturacion() {
+        new MenuFacturacion(scanner, usuario.getId()).show();
     }
 
     private void abrirUadeChat() {

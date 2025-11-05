@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import controlador.MedicionesController;
 import controlador.SensorController;
 import modelo.MedicionesPorCiudad;
 import modelo.MedicionesPorPais;
@@ -17,11 +18,21 @@ import repositories.MedicionesCassandraRepository;
 public class MenuVerMediciones implements Menu {
 
     private final SensorController sensorController;
+    private final MedicionesController medicionesController;
     private final Scanner scanner;
+    private String usuarioId;
 
     public MenuVerMediciones(SensorController sensorController, Scanner scanner) {
         this.sensorController = sensorController;
+        this.medicionesController = MedicionesController.getInstance();
         this.scanner = scanner;
+    }
+    
+    public void setUsuarioId(String usuarioId) {
+        this.usuarioId = usuarioId;
+        if (usuarioId != null) {
+            medicionesController.setUsuarioActual(usuarioId);
+        }
     }
 
     @Override
@@ -141,8 +152,8 @@ public class MenuVerMediciones implements Menu {
             return;
         }
 
-        // Usar repo para filtrar por rango y zona
-        List<MedicionesPorZona> mediciones = MedicionesCassandraRepository.getInstance().findByZonaYRangoFechas(zonaSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
+        // Usar controller para registrar el proceso automáticamente
+        List<MedicionesPorZona> mediciones = medicionesController.obtenerMedicionesPorZonaYRango(zonaSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
         System.out.println("--- Mediciones para zona: " + zonaSeleccionada + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
         if (mediciones.isEmpty()) {
             System.out.println("No hay mediciones en ese rango.");
@@ -238,8 +249,8 @@ public class MenuVerMediciones implements Menu {
             return;
         }
 
-        // Usar repo para filtrar por rango y país
-        List<MedicionesPorPais> mediciones = MedicionesCassandraRepository.getInstance().findByPaisYRangoFechas(paisSeleccionado, tipoSeleccionado, fechaInicio, fechaFin);
+        // Usar controller para registrar el proceso automáticamente
+        List<MedicionesPorPais> mediciones = medicionesController.obtenerMedicionesPorPaisYRango(paisSeleccionado, tipoSeleccionado, fechaInicio, fechaFin);
         System.out.println("--- Mediciones para país: " + paisSeleccionado + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
         if (mediciones.isEmpty()) {
             System.out.println("No hay mediciones en ese rango.");
@@ -335,8 +346,8 @@ public class MenuVerMediciones implements Menu {
             return;
         }
 
-        // Usar repo para filtrar por rango y ciudad
-        List<MedicionesPorCiudad> mediciones = MedicionesCassandraRepository.getInstance().findByCiudadYRangoFechas(ciudadSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
+        // Usar controller para registrar el proceso automáticamente
+        List<MedicionesPorCiudad> mediciones = medicionesController.obtenerMedicionesPorCiudadYRango(ciudadSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
         System.out.println("--- Mediciones para ciudad: " + ciudadSeleccionada + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
         if (mediciones.isEmpty()) {
             System.out.println("No hay mediciones en ese rango.");

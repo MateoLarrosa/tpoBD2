@@ -16,10 +16,6 @@ import com.mongodb.client.result.InsertOneResult;
 
 import modelo.Pago;
 
-/**
- * Repositorio para gestionar pagos de facturas.
- * Implementa el patrón Singleton.
- */
 public class PagoRepository implements IRepository<Pago> {
 
     private final MongoDatabase database;
@@ -41,15 +37,15 @@ public class PagoRepository implements IRepository<Pago> {
         Pago pago = new Pago();
         pago.setId(doc.getObjectId("_id").toString());
         pago.setFacturaId(doc.getString("facturaId"));
-        
+
         Date fechaPagoDate = doc.getDate("fechaPago");
         if (fechaPagoDate != null) {
             pago.setFechaPago(fechaPagoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
-        
+
         pago.setMontoPagado(doc.getDouble("montoPagado"));
         pago.setMetodoPago(doc.getString("metodoPago"));
-        
+
         return pago;
     }
 
@@ -105,20 +101,12 @@ public class PagoRepository implements IRepository<Pago> {
         collection.deleteOne(Filters.eq("_id", new ObjectId(id)));
     }
 
-    // Métodos de consulta específicos
-
-    /**
-     * Obtiene el pago asociado a una factura
-     */
     public Pago findByFacturaId(String facturaId) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         Document doc = collection.find(Filters.eq("facturaId", facturaId)).first();
         return doc != null ? mapDocumentToPago(doc) : null;
     }
 
-    /**
-     * Obtiene pagos por método de pago
-     */
     public List<Pago> findByMetodoPago(String metodoPago) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Pago> pagos = new ArrayList<>();
@@ -128,16 +116,13 @@ public class PagoRepository implements IRepository<Pago> {
         return pagos;
     }
 
-    /**
-     * Obtiene pagos en un rango de fechas
-     */
     public List<Pago> findByRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Pago> pagos = new ArrayList<>();
-        
+
         Date inicio = Date.from(fechaInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date fin = Date.from(fechaFin.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        
+
         collection.find(Filters.and(
                 Filters.gte("fechaPago", inicio),
                 Filters.lte("fechaPago", fin)
@@ -147,9 +132,6 @@ public class PagoRepository implements IRepository<Pago> {
         return pagos;
     }
 
-    /**
-     * Calcula el monto total pagado en un rango de fechas
-     */
     public double calcularMontoTotalPagado(LocalDate fechaInicio, LocalDate fechaFin) {
         List<Pago> pagos = findByRangoFechas(fechaInicio, fechaFin);
         return pagos.stream().mapToDouble(Pago::getMontoPagado).sum();

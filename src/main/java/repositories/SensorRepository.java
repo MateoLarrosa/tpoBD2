@@ -42,7 +42,8 @@ public class SensorRepository implements IRepository<Sensor> {
                 .append("pais", sensor.getPais())
                 .append("zona", sensor.getZona())
                 .append("estado", sensor.getEstado() != null ? sensor.getEstado().name() : null)
-                .append("fechaInicioEmision", sensor.getFechaInicioEmision());
+                .append("fechaInicioEmision", sensor.getFechaInicioEmision())
+                .append("montoPorMedicion", sensor.getMontoPorMedicion());
         InsertOneResult result = collection.insertOne(doc);
         if (doc.getObjectId("_id") != null) {
             sensor.setId(doc.getObjectId("_id").toHexString());
@@ -99,6 +100,20 @@ public class SensorRepository implements IRepository<Sensor> {
             }
         }
         s.setFechaInicioEmision(doc.getDate("fechaInicioEmision"));
+        if (doc.containsKey("montoPorMedicion")) {
+            Object montoObj = doc.get("montoPorMedicion");
+            if (montoObj instanceof Number) {
+                s.setMontoPorMedicion(((Number) montoObj).doubleValue());
+            } else if (montoObj != null) {
+                try {
+                    s.setMontoPorMedicion(Double.parseDouble(montoObj.toString()));
+                } catch (Exception e) {
+                    s.setMontoPorMedicion(0.0);
+                }
+            }
+        } else {
+            s.setMontoPorMedicion(0.0);
+        }
         return s;
     }
 }

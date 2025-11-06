@@ -21,6 +21,7 @@ connections/CassandraPool.class
 services/MensajeriaService.class
 modelo/EstadoSensor.class
 menus/MenuVerMediciones.class
+menus/MenuSolicitarProceso.class
 repositories/IRepository.class
 menus/MenuMediciones.class
 modelo/Mensaje.class
@@ -28,6 +29,7 @@ services/UsuarioService.class
 menus/MenuUsuario.class
 modelo/SensoresPorUbicacion.class
 modelo/MedicionesPorPais.class
+modelo/Mediciones.class
 main/MainMensajeria.class
 modelo/CuentaCorriente.class
 modelo/Proceso.class

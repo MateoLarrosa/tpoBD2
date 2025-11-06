@@ -9,31 +9,30 @@ public class Factura {
     private String id;
     private String usuarioId;
     private LocalDate fechaEmision;
-    private List<String> procesosFacturadosIds; // IDs de SolicitudProceso
+    private List<SolicitudProceso> solicitudesFacturadas;
     private EstadoFactura estado;
     private double montoTotal;
     private LocalDate fechaVencimiento;
 
     public Factura() {
-        this.procesosFacturadosIds = new ArrayList<>();
+        this.solicitudesFacturadas = new ArrayList<>();
         this.estado = EstadoFactura.PENDIENTE;
     }
 
-    public Factura(String id, String usuarioId, LocalDate fechaEmision, List<String> procesosFacturadosIds, 
-                   EstadoFactura estado, double montoTotal, LocalDate fechaVencimiento) {
+    public Factura(String id, String usuarioId, LocalDate fechaEmision, List<SolicitudProceso> solicitudesFacturadas,
+            EstadoFactura estado, double montoTotal, LocalDate fechaVencimiento) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.fechaEmision = fechaEmision;
-        this.procesosFacturadosIds = procesosFacturadosIds != null ? procesosFacturadosIds : new ArrayList<>();
+        this.solicitudesFacturadas = solicitudesFacturadas != null ? solicitudesFacturadas : new ArrayList<>();
         this.estado = estado;
         this.montoTotal = montoTotal;
         this.fechaVencimiento = fechaVencimiento;
     }
 
-    // Métodos de negocio
-    public void agregarProcesoFacturado(String solicitudProcesoId) {
-        if (!this.procesosFacturadosIds.contains(solicitudProcesoId)) {
-            this.procesosFacturadosIds.add(solicitudProcesoId);
+    public void agregarSolicitudFacturada(SolicitudProceso solicitud) {
+        if (solicitud != null && !this.solicitudesFacturadas.contains(solicitud)) {
+            this.solicitudesFacturadas.add(solicitud);
         }
     }
 
@@ -49,7 +48,6 @@ public class Factura {
         return LocalDate.now().isAfter(fechaVencimiento) && estado == EstadoFactura.PENDIENTE;
     }
 
-    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -74,12 +72,12 @@ public class Factura {
         this.fechaEmision = fechaEmision;
     }
 
-    public List<String> getProcesosFacturadosIds() {
-        return procesosFacturadosIds;
+    public List<SolicitudProceso> getSolicitudesFacturadas() {
+        return solicitudesFacturadas;
     }
 
-    public void setProcesosFacturadosIds(List<String> procesosFacturadosIds) {
-        this.procesosFacturadosIds = procesosFacturadosIds;
+    public void setSolicitudesFacturadas(List<SolicitudProceso> solicitudesFacturadas) {
+        this.solicitudesFacturadas = solicitudesFacturadas;
     }
 
     public EstadoFactura getEstado() {
@@ -108,14 +106,14 @@ public class Factura {
 
     @Override
     public String toString() {
-        return "Factura{" +
-                "id='" + id + '\'' +
-                ", usuarioId='" + usuarioId + '\'' +
-                ", fechaEmision=" + fechaEmision +
-                ", procesosFacturados=" + procesosFacturadosIds.size() +
-                ", estado=" + estado +
-                ", montoTotal=" + montoTotal +
-                ", fechaVencimiento=" + fechaVencimiento +
-                '}';
+        return "Factura{"
+                + "id='" + id + '\''
+                + ", usuarioId='" + usuarioId + '\''
+                + ", fechaEmision=" + fechaEmision
+                + ", solicitudesFacturadas=" + solicitudesFacturadas.size()
+                + ", estado=" + estado
+                + ", montoTotal=" + montoTotal
+                + ", fechaVencimiento=" + fechaVencimiento
+                + '}';
     }
 }

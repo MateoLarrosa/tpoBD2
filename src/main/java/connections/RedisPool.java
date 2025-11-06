@@ -16,7 +16,7 @@ public class RedisPool {
     private RedisPool() {
         String envRedisUrl = System.getenv("REDIS_URL");
         if (envRedisUrl == null || envRedisUrl.isEmpty()) {
-            envRedisUrl = "redis://127.0.0.1:6379";
+            envRedisUrl = "redis://localhost:6379";
         }
         redisUrl = envRedisUrl;
 

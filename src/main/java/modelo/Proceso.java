@@ -1,9 +1,5 @@
 package modelo;
 
-/**
- * Representa un proceso disponible en el catálogo de servicios del sistema.
- * Cada proceso tiene un costo asociado y puede ser solicitado por los usuarios.
- */
 public class Proceso {
 
     private String id;
@@ -64,12 +60,12 @@ public class Proceso {
 
     @Override
     public String toString() {
-        return "Proceso{" +
-                "id='" + id + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", tipoProceso='" + tipoProceso + '\'' +
-                ", costo=" + costo +
-                '}';
+        return "Proceso{"
+                + "id='" + id + '\''
+                + ", nombre='" + nombre + '\''
+                + ", descripcion='" + descripcion + '\''
+                + ", tipoProceso='" + tipoProceso + '\''
+                + ", costo=" + costo
+                + '}';
     }
 }

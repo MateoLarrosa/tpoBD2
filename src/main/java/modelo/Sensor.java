@@ -14,11 +14,12 @@ public class Sensor {
     private String zona;
     private EstadoSensor estado;
     private Date fechaInicioEmision;
+    private double montoPorMedicion;
 
     public Sensor() {
     }
 
-    public Sensor(String id, String nombre, TipoSensor tipo, double latitud, double longitud, String ciudad, String pais, String zona, EstadoSensor estado, Date fechaInicioEmision) {
+    public Sensor(String id, String nombre, TipoSensor tipo, double latitud, double longitud, String ciudad, String pais, String zona, EstadoSensor estado, Date fechaInicioEmision, double montoPorMedicion) {
         this.id = id;
         this.nombre = nombre;
         this.tipo = tipo;
@@ -29,6 +30,15 @@ public class Sensor {
         this.zona = zona;
         this.estado = estado;
         this.fechaInicioEmision = fechaInicioEmision;
+        this.montoPorMedicion = montoPorMedicion;
+    }
+
+    public double getMontoPorMedicion() {
+        return montoPorMedicion;
+    }
+
+    public void setMontoPorMedicion(double montoPorMedicion) {
+        this.montoPorMedicion = montoPorMedicion;
     }
 
     public String getZona() {
@@ -109,5 +119,17 @@ public class Sensor {
 
     public void setFechaInicioEmision(Date fechaInicioEmision) {
         this.fechaInicioEmision = fechaInicioEmision;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + id
+                + ", Nombre: " + nombre
+                + ", Tipo: " + tipo
+                + ", Estado: " + estado
+                + ", Ciudad: " + ciudad
+                + ", País: " + pais
+                + ", Zona: " + zona
+                + ", Monto x medición: " + montoPorMedicion;
     }
 }

@@ -13,10 +13,6 @@ import com.mongodb.client.result.InsertOneResult;
 
 import modelo.Proceso;
 
-/**
- * Repositorio para gestionar el catálogo de procesos disponibles en el sistema.
- * Implementa el patrón Singleton.
- */
 public class ProcesoRepository implements IRepository<Proceso> {
 
     private final MongoDatabase database;
@@ -78,22 +74,12 @@ public class ProcesoRepository implements IRepository<Proceso> {
         return procesos;
     }
 
-    /**
-     * Busca un proceso por su nombre
-     * @param nombre Nombre del proceso
-     * @return El proceso encontrado o null
-     */
     public Proceso findByNombre(String nombre) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         Document doc = collection.find(Filters.eq("nombre", nombre)).first();
         return doc != null ? mapDocumentToProceso(doc) : null;
     }
 
-    /**
-     * Busca procesos por tipo
-     * @param tipoProceso Tipo de proceso
-     * @return Lista de procesos del tipo especificado
-     */
     public List<Proceso> findByTipo(String tipoProceso) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Proceso> procesos = new ArrayList<>();
@@ -103,21 +89,17 @@ public class ProcesoRepository implements IRepository<Proceso> {
         return procesos;
     }
 
-    /**
-     * Actualiza un proceso existente
-     * @param proceso Proceso con los datos actualizados
-     */
     public void update(Proceso proceso) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
-        
+
         Document updateDoc = new Document("nombre", proceso.getNombre())
                 .append("descripcion", proceso.getDescripcion())
                 .append("tipoProceso", proceso.getTipoProceso())
                 .append("costo", proceso.getCosto());
 
         collection.updateOne(
-            Filters.eq("_id", new ObjectId(proceso.getId())),
-            new Document("$set", updateDoc)
+                Filters.eq("_id", new ObjectId(proceso.getId())),
+                new Document("$set", updateDoc)
         );
     }
 

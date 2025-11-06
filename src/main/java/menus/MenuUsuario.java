@@ -21,15 +21,24 @@ public class MenuUsuario implements Menu {
         this.scanner = scanner;
         this.sesionController = sesionController;
         options.add(new MenuOption("Ver perfil", this::verPerfil));
-        options.add(new MenuOption("Consultar mediciones", this::menuMediciones));
+        options.add(new MenuOption("Solicitar proceso", this::menuSolicitarProceso));
         options.add(new MenuOption("Mis procesos y solicitudes", this::menuProcesos));
         options.add(new MenuOption("Mis facturas y pagos", this::menuFacturacion));
         options.add(new MenuOption("UADE Chat", this::abrirUadeChat));
+        // Si el rol es ADMIN, insertar el menú de sensores antes de 'Cerrar sesión'
+        if (usuario.getRol() != null && usuario.getRol().equalsIgnoreCase("ADMIN")) {
+            int insertIdx = Math.max(0, options.size());
+            options.add(insertIdx, new MenuOption("Menú de sensores", this::menuSensoresAdmin));
+        }
         options.add(new MenuOption("Cerrar sesión", this::cerrarSesion));
     }
 
-    private void menuMediciones() {
-        MenuVerMediciones menu = new MenuVerMediciones(SensorController.getInstance(), scanner);
+    private void menuSensoresAdmin() {
+        new MenuSensor(SensorController.getInstance(), scanner).show();
+    }
+
+    private void menuSolicitarProceso() {
+        MenuSolicitarProceso menu = new MenuSolicitarProceso(scanner);
         menu.setUsuarioId(usuario.getId());
         menu.show();
     }

@@ -46,7 +46,7 @@ public class MenuMediciones implements Menu {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             sdf.setLenient(false);
             Date fecha = sdf.parse(fechaStr);
-            // Extraer año y mes
+            
             Calendar cal = Calendar.getInstance();
             cal.setTime(fecha);
             anio = cal.get(Calendar.YEAR);

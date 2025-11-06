@@ -69,7 +69,7 @@ public class RedisMessageRepository {
             String key = KEY_PREFIX + chatKey;
             XReadGroupParams params = XReadGroupParams.xReadGroupParams()
                     .count(count)
-                    .block(blockMs);  // <- int
+                    .block(blockMs);  
 
             Map<String, StreamEntryID> streams
                     = Collections.singletonMap(key, StreamEntryID.UNRECEIVED_ENTRY);

@@ -11,13 +11,14 @@ public class MedicionesPorCiudad {
     public int mes;
     public Date fecha;
     public double valor;
+    public double monto;
     public String nombre;
     public Double latitud;
     public Double longitud;
     public String pais;
     public String zona;
 
-    public MedicionesPorCiudad(String idSensor, String tipo, String ciudad, int anio, int mes, Date fecha, double valor, String nombre, Double latitud, Double longitud, String pais, String zona) {
+    public MedicionesPorCiudad(String idSensor, String tipo, String ciudad, int anio, int mes, Date fecha, double valor, double monto, String nombre, Double latitud, Double longitud, String pais, String zona) {
         this.idSensor = idSensor;
         this.tipo = tipo;
         this.ciudad = ciudad;
@@ -25,6 +26,7 @@ public class MedicionesPorCiudad {
         this.mes = mes;
         this.fecha = fecha;
         this.valor = valor;
+        this.monto = monto;
         this.nombre = nombre;
         this.latitud = latitud;
         this.longitud = longitud;
@@ -49,6 +51,7 @@ public class MedicionesPorCiudad {
                 + ", Fecha UTC: " + fechaUtc
                 + ", Año: " + anio
                 + ", Mes: " + mes
-                + ", Valor: " + valor;
+                + ", Valor: " + valor
+                + ", Monto: " + monto;
     }
 }

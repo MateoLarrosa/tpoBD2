@@ -6,10 +6,10 @@ import java.util.UUID;
 public class AlertasActivasPorUbicacion {
 
     private String pais;
-    private String estado; // 'activa' o 'resuelta'
+    private String estado; 
     private LocalDate fechaHora;
     private UUID alertaId;
-    private String tipo; // 'sensor' o 'climática'
+    private String tipo; 
     private String descripcion;
 
     public AlertasActivasPorUbicacion() {

@@ -40,7 +40,7 @@ public class MedicionesCassandraRepository {
             int mesDesde = (anio == anioIni) ? mesIni : 1;
             int mesHasta = (anio == anioFin) ? mesFin : 12;
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
-                String query = "SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM " + TABLE_ZONA + " WHERE zona=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
+                String query = "SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor, monto FROM " + TABLE_ZONA + " WHERE zona=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
                 PreparedStatement ps = session.prepare(query);
                 BoundStatement bs = ps.bind(zona, tipo, anio, mes, fechaInicio.toInstant(), fechaFin.toInstant());
                 ResultSet rs = session.execute(bs);
@@ -55,6 +55,7 @@ public class MedicionesCassandraRepository {
                             row.getInt("mes"),
                             fecha,
                             row.getDouble("valor"),
+                            row.getDouble("monto"),
                             row.getString("nombre"),
                             row.getDouble("latitud"),
                             row.getDouble("longitud"),
@@ -81,7 +82,7 @@ public class MedicionesCassandraRepository {
             int mesDesde = (anio == anioIni) ? mesIni : 1;
             int mesHasta = (anio == anioFin) ? mesFin : 12;
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
-                String query = "SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM " + TABLE_PAIS + " WHERE pais=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
+                String query = "SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor, monto FROM " + TABLE_PAIS + " WHERE pais=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
                 PreparedStatement ps = session.prepare(query);
                 BoundStatement bs = ps.bind(pais, tipo, anio, mes, fechaInicio.toInstant(), fechaFin.toInstant());
                 ResultSet rs = session.execute(bs);
@@ -96,6 +97,7 @@ public class MedicionesCassandraRepository {
                             row.getInt("mes"),
                             fecha,
                             row.getDouble("valor"),
+                            row.getDouble("monto"),
                             row.getString("nombre"),
                             row.getDouble("latitud"),
                             row.getDouble("longitud"),
@@ -122,7 +124,7 @@ public class MedicionesCassandraRepository {
             int mesDesde = (anio == anioIni) ? mesIni : 1;
             int mesHasta = (anio == anioFin) ? mesFin : 12;
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
-                String query = "SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM " + TABLE_CIUDAD + " WHERE ciudad=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
+                String query = "SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor, monto FROM " + TABLE_CIUDAD + " WHERE ciudad=? AND tipo=? AND anio=? AND mes=? AND fecha >= ? AND fecha <= ? ALLOW FILTERING";
                 PreparedStatement ps = session.prepare(query);
                 BoundStatement bs = ps.bind(ciudad, tipo, anio, mes, fechaInicio.toInstant(), fechaFin.toInstant());
                 ResultSet rs = session.execute(bs);
@@ -137,6 +139,7 @@ public class MedicionesCassandraRepository {
                             row.getInt("mes"),
                             fecha,
                             row.getDouble("valor"),
+                            row.getDouble("monto"),
                             row.getString("nombre"),
                             row.getDouble("latitud"),
                             row.getDouble("longitud"),
@@ -152,7 +155,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorZona> findAllZona() {
         List<MedicionesPorZona> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor FROM " + TABLE_ZONA);
+        ResultSet rs = session.execute("SELECT zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor, monto FROM " + TABLE_ZONA);
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -164,6 +167,7 @@ public class MedicionesCassandraRepository {
                     row.getInt("mes"),
                     fecha,
                     row.getDouble("valor"),
+                    row.getDouble("monto"),
                     row.getString("nombre"),
                     row.getDouble("latitud"),
                     row.getDouble("longitud"),
@@ -177,7 +181,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorPais> findAllPais() {
         List<MedicionesPorPais> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor FROM " + TABLE_PAIS);
+        ResultSet rs = session.execute("SELECT pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor, monto FROM " + TABLE_PAIS);
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -189,6 +193,7 @@ public class MedicionesCassandraRepository {
                     row.getInt("mes"),
                     fecha,
                     row.getDouble("valor"),
+                    row.getDouble("monto"),
                     row.getString("nombre"),
                     row.getDouble("latitud"),
                     row.getDouble("longitud"),
@@ -202,7 +207,7 @@ public class MedicionesCassandraRepository {
 
     public List<MedicionesPorCiudad> findAllCiudad() {
         List<MedicionesPorCiudad> result = new ArrayList<>();
-        ResultSet rs = session.execute("SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor FROM " + TABLE_CIUDAD);
+        ResultSet rs = session.execute("SELECT ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor, monto FROM " + TABLE_CIUDAD);
         for (Row row : rs) {
             Instant fechaInstant = row.getInstant("fecha");
             Date fecha = (fechaInstant != null) ? Date.from(fechaInstant) : null;
@@ -214,6 +219,7 @@ public class MedicionesCassandraRepository {
                     row.getInt("mes"),
                     fecha,
                     row.getDouble("valor"),
+                    row.getDouble("monto"),
                     row.getString("nombre"),
                     row.getDouble("latitud"),
                     row.getDouble("longitud"),
@@ -239,16 +245,16 @@ public class MedicionesCassandraRepository {
             crearTablasSiNoExisten();
 
             this.insertZonaPs = session.prepare(
-                    "INSERT INTO " + TABLE_ZONA + " (zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO " + TABLE_ZONA + " (zona, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, pais, valor, monto) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             this.insertPaisPs = session.prepare(
-                    "INSERT INTO " + TABLE_PAIS + " (pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO " + TABLE_PAIS + " (pais, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, ciudad, zona, valor, monto) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             this.insertCiudadPs = session.prepare(
-                    "INSERT INTO " + TABLE_CIUDAD + " (ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO " + TABLE_CIUDAD + " (ciudad, tipo, anio, mes, fecha, idSensor, nombre, latitud, longitud, pais, zona, valor, monto) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
         } catch (ErrorConectionMongoException e) {
             throw new RuntimeException("No se pudo obtener la sesión de Cassandra", e);
@@ -341,15 +347,15 @@ public class MedicionesCassandraRepository {
 
         if (mz != null && mz.zona != null && !mz.zona.isBlank()) {
             Instant fechaZona = (mz.fecha != null) ? mz.fecha.toInstant() : null;
-            batch.addStatement(insertZonaPs.bind(mz.zona, mz.tipo, mz.anio, mz.mes, fechaZona, mz.idSensor, mz.nombre, mz.latitud, mz.longitud, mz.ciudad, mz.pais, mz.valor));
+            batch.addStatement(insertZonaPs.bind(mz.zona, mz.tipo, mz.anio, mz.mes, fechaZona, mz.idSensor, mz.nombre, mz.latitud, mz.longitud, mz.ciudad, mz.pais, mz.valor, mz.monto));
         }
         if (mp != null && mp.pais != null && !mp.pais.isBlank()) {
             Instant fechaPais = (mp.fecha != null) ? mp.fecha.toInstant() : null;
-            batch.addStatement(insertPaisPs.bind(mp.pais, mp.tipo, mp.anio, mp.mes, fechaPais, mp.idSensor, mp.nombre, mp.latitud, mp.longitud, mp.ciudad, mp.zona, mp.valor));
+            batch.addStatement(insertPaisPs.bind(mp.pais, mp.tipo, mp.anio, mp.mes, fechaPais, mp.idSensor, mp.nombre, mp.latitud, mp.longitud, mp.ciudad, mp.zona, mp.valor, mp.monto));
         }
         if (mc != null && mc.ciudad != null && !mc.ciudad.isBlank()) {
             Instant fechaCiudad = (mc.fecha != null) ? mc.fecha.toInstant() : null;
-            batch.addStatement(insertCiudadPs.bind(mc.ciudad, mc.tipo, mc.anio, mc.mes, fechaCiudad, mc.idSensor, mc.nombre, mc.latitud, mc.longitud, mc.pais, mc.zona, mc.valor));
+            batch.addStatement(insertCiudadPs.bind(mc.ciudad, mc.tipo, mc.anio, mc.mes, fechaCiudad, mc.idSensor, mc.nombre, mc.latitud, mc.longitud, mc.pais, mc.zona, mc.valor, mc.monto));
         }
 
         if (batch.build().size() == 0) {

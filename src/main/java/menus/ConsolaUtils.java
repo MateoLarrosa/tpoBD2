@@ -13,7 +13,7 @@ import repositories.MedicionesCassandraRepository;
 
 public class ConsolaUtils {
 
-    // Pide rango de fechas y devuelve array [inicio, fin] o null si error
+    
     public static Date[] pedirRangoFechas(Scanner scanner) {
         try {
             System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
@@ -30,7 +30,7 @@ public class ConsolaUtils {
         }
     }
 
-    // Obtiene los valores double de las mediciones según filtros
+    
     public static List<Double> obtenerValoresMediciones(String ubicacion, String tipo, Date fechaInicio, Date fechaFin) {
         List<Double> valores = new ArrayList<>();
         if ("zona".equals(ubicacion)) {

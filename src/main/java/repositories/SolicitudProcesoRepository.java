@@ -18,12 +18,9 @@ import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 
 import modelo.EstadoSolicitud;
+import modelo.Proceso;
 import modelo.SolicitudProceso;
 
-/**
- * Repositorio para gestionar las solicitudes de procesos realizadas por usuarios.
- * Implementa el patrón Singleton.
- */
 public class SolicitudProcesoRepository implements IRepository<SolicitudProceso> {
 
     private final MongoDatabase database;
@@ -45,38 +42,46 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
         SolicitudProceso solicitud = new SolicitudProceso();
         solicitud.setId(doc.getObjectId("_id").toString());
         solicitud.setUsuarioId(doc.getString("usuarioId"));
-        solicitud.setProcesoId(doc.getString("procesoId"));
-        
-        // Convertir parametros de Document a Map
+
+        Document procesoDoc = doc.get("proceso", Document.class);
+        if (procesoDoc != null) {
+            Proceso proceso = new Proceso();
+            proceso.setId(procesoDoc.getString("id"));
+            proceso.setNombre(procesoDoc.getString("nombre"));
+            proceso.setDescripcion(procesoDoc.getString("descripcion"));
+            proceso.setTipoProceso(procesoDoc.getString("tipoProceso"));
+            proceso.setCosto(procesoDoc.getInteger("costo", 0));
+            solicitud.setProceso(proceso);
+        }
+
         Document parametrosDoc = doc.get("parametros", Document.class);
         if (parametrosDoc != null) {
             Map<String, Object> parametros = new HashMap<>(parametrosDoc);
             solicitud.setParametros(parametros);
         }
-        
-        // Convertir fechas de Date a LocalDateTime
+
         Date fechaSolicitud = doc.getDate("fechaSolicitud");
         if (fechaSolicitud != null) {
             solicitud.setFechaSolicitud(fechaSolicitud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
-        
+
         Date fechaCompletado = doc.getDate("fechaCompletado");
         if (fechaCompletado != null) {
             solicitud.setFechaCompletado(fechaCompletado.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
-        
+
         String estadoStr = doc.getString("estado");
         if (estadoStr != null) {
             solicitud.setEstado(EstadoSolicitud.valueOf(estadoStr));
         }
-        
+
         solicitud.setResultado(doc.getString("resultado"));
-        
+
         Long tiempoEjecucion = doc.getLong("tiempoEjecucionMs");
         if (tiempoEjecucion != null) {
             solicitud.setTiempoEjecucionMs(tiempoEjecucion);
         }
-        
+
         return solicitud;
     }
 
@@ -84,7 +89,6 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
     public InsertOneResult save(SolicitudProceso solicitud) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
 
-        // Convertir LocalDateTime a Date para MongoDB
         Date fechaSolicitud = null;
         if (solicitud.getFechaSolicitud() != null) {
             fechaSolicitud = Date.from(solicitud.getFechaSolicitud().atZone(ZoneId.systemDefault()).toInstant());
@@ -95,8 +99,18 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
             fechaCompletado = Date.from(solicitud.getFechaCompletado().atZone(ZoneId.systemDefault()).toInstant());
         }
 
+        Document procesoDoc = null;
+        if (solicitud.getProceso() != null) {
+            Proceso proceso = solicitud.getProceso();
+            procesoDoc = new Document("id", proceso.getId())
+                    .append("nombre", proceso.getNombre())
+                    .append("descripcion", proceso.getDescripcion())
+                    .append("tipoProceso", proceso.getTipoProceso())
+                    .append("costo", proceso.getCosto());
+        }
+
         Document doc = new Document("usuarioId", solicitud.getUsuarioId())
-                .append("procesoId", solicitud.getProcesoId())
+                .append("proceso", procesoDoc)
                 .append("fechaSolicitud", fechaSolicitud)
                 .append("estado", solicitud.getEstado().name())
                 .append("parametros", solicitud.getParametros() != null ? new Document(solicitud.getParametros()) : null)
@@ -129,11 +143,6 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
         return solicitudes;
     }
 
-    /**
-     * Busca todas las solicitudes de un usuario
-     * @param usuarioId ID del usuario
-     * @return Lista de solicitudes del usuario
-     */
     public List<SolicitudProceso> findByUsuarioId(String usuarioId) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<SolicitudProceso> solicitudes = new ArrayList<>();
@@ -144,11 +153,6 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
         return solicitudes;
     }
 
-    /**
-     * Busca solicitudes por estado
-     * @param estado Estado de la solicitud
-     * @return Lista de solicitudes con ese estado
-     */
     public List<SolicitudProceso> findByEstado(EstadoSolicitud estado) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<SolicitudProceso> solicitudes = new ArrayList<>();
@@ -159,74 +163,52 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
         return solicitudes;
     }
 
-    /**
-     * Busca solicitudes de un usuario por estado
-     * @param usuarioId ID del usuario
-     * @param estado Estado de la solicitud
-     * @return Lista de solicitudes
-     */
     public List<SolicitudProceso> findByUsuarioIdYEstado(String usuarioId, EstadoSolicitud estado) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<SolicitudProceso> solicitudes = new ArrayList<>();
         for (Document doc : collection.find(
                 Filters.and(
-                    Filters.eq("usuarioId", usuarioId),
-                    Filters.eq("estado", estado.name())
+                        Filters.eq("usuarioId", usuarioId),
+                        Filters.eq("estado", estado.name())
                 )
-            ).sort(Sorts.descending("fechaSolicitud"))) {
+        ).sort(Sorts.descending("fechaSolicitud"))) {
             solicitudes.add(mapDocumentToSolicitud(doc));
         }
         return solicitudes;
     }
 
-    /**
-     * Busca solicitudes de un usuario en un rango de fechas
-     * @param usuarioId ID del usuario
-     * @param fechaInicio Fecha de inicio
-     * @param fechaFin Fecha de fin
-     * @return Lista de solicitudes en el rango
-     */
     public List<SolicitudProceso> findByUsuarioIdYRangoFechas(String usuarioId, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
-        
+
         Date dateInicio = Date.from(fechaInicio.atZone(ZoneId.systemDefault()).toInstant());
         Date dateFin = Date.from(fechaFin.atZone(ZoneId.systemDefault()).toInstant());
-        
+
         List<SolicitudProceso> solicitudes = new ArrayList<>();
         for (Document doc : collection.find(
                 Filters.and(
-                    Filters.eq("usuarioId", usuarioId),
-                    Filters.gte("fechaSolicitud", dateInicio),
-                    Filters.lte("fechaSolicitud", dateFin)
+                        Filters.eq("usuarioId", usuarioId),
+                        Filters.gte("fechaSolicitud", dateInicio),
+                        Filters.lte("fechaSolicitud", dateFin)
                 )
-            ).sort(Sorts.descending("fechaSolicitud"))) {
+        ).sort(Sorts.descending("fechaSolicitud"))) {
             solicitudes.add(mapDocumentToSolicitud(doc));
         }
         return solicitudes;
     }
 
-    /**
-     * Busca solicitudes por proceso
-     * @param procesoId ID del proceso
-     * @return Lista de solicitudes de ese proceso
-     */
     public List<SolicitudProceso> findByProcesoId(String procesoId) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<SolicitudProceso> solicitudes = new ArrayList<>();
-        for (Document doc : collection.find(Filters.eq("procesoId", procesoId))
+        for (Document doc : collection.find(Filters.eq("proceso.id", procesoId))
                 .sort(Sorts.descending("fechaSolicitud"))) {
             solicitudes.add(mapDocumentToSolicitud(doc));
         }
         return solicitudes;
     }
 
-    /**
-     * Actualiza una solicitud existente
-     * @param solicitud Solicitud con los datos actualizados
-     */
     public void update(SolicitudProceso solicitud) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
-        
+
         Date fechaCompletado = null;
         if (solicitud.getFechaCompletado() != null) {
             fechaCompletado = Date.from(solicitud.getFechaCompletado().atZone(ZoneId.systemDefault()).toInstant());
@@ -238,8 +220,8 @@ public class SolicitudProcesoRepository implements IRepository<SolicitudProceso>
                 .append("fechaCompletado", fechaCompletado);
 
         collection.updateOne(
-            Filters.eq("_id", new ObjectId(solicitud.getId())),
-            new Document("$set", updateDoc)
+                Filters.eq("_id", new ObjectId(solicitud.getId())),
+                new Document("$set", updateDoc)
         );
     }
 

@@ -22,7 +22,6 @@ public class Pago {
         this.metodoPago = metodoPago;
     }
 
-    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -65,12 +64,12 @@ public class Pago {
 
     @Override
     public String toString() {
-        return "Pago{" +
-                "id='" + id + '\'' +
-                ", facturaId='" + facturaId + '\'' +
-                ", fechaPago=" + fechaPago +
-                ", montoPagado=" + montoPagado +
-                ", metodoPago='" + metodoPago + '\'' +
-                '}';
+        return "Pago{"
+                + "id='" + id + '\''
+                + ", facturaId='" + facturaId + '\''
+                + ", fechaPago=" + fechaPago
+                + ", montoPagado=" + montoPagado
+                + ", metodoPago='" + metodoPago + '\''
+                + '}';
     }
 }

@@ -3,15 +3,11 @@ package modelo;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Representa una solicitud/ejecución de un proceso por parte de un usuario.
- * Registra cada vez que un usuario utiliza un servicio del sistema.
- */
 public class SolicitudProceso {
 
     private String id;
     private String usuarioId;
-    private String procesoId;
+    private Proceso proceso;
     private LocalDateTime fechaSolicitud;
     private EstadoSolicitud estado;
     private Map<String, Object> parametros;
@@ -22,9 +18,9 @@ public class SolicitudProceso {
     public SolicitudProceso() {
     }
 
-    public SolicitudProceso(String usuarioId, String procesoId, Map<String, Object> parametros) {
+    public SolicitudProceso(String usuarioId, Proceso proceso, Map<String, Object> parametros) {
         this.usuarioId = usuarioId;
-        this.procesoId = procesoId;
+        this.proceso = proceso;
         this.parametros = parametros;
         this.fechaSolicitud = LocalDateTime.now();
         this.estado = EstadoSolicitud.PENDIENTE;
@@ -46,12 +42,12 @@ public class SolicitudProceso {
         this.usuarioId = usuarioId;
     }
 
-    public String getProcesoId() {
-        return procesoId;
+    public Proceso getProceso() {
+        return proceso;
     }
 
-    public void setProcesoId(String procesoId) {
-        this.procesoId = procesoId;
+    public void setProceso(Proceso proceso) {
+        this.proceso = proceso;
     }
 
     public LocalDateTime getFechaSolicitud() {
@@ -102,9 +98,6 @@ public class SolicitudProceso {
         this.fechaCompletado = fechaCompletado;
     }
 
-    /**
-     * Marca la solicitud como completada
-     */
     public void completar(String resultado, long tiempoEjecucionMs) {
         this.estado = EstadoSolicitud.COMPLETADO;
         this.resultado = resultado;
@@ -112,9 +105,6 @@ public class SolicitudProceso {
         this.fechaCompletado = LocalDateTime.now();
     }
 
-    /**
-     * Marca la solicitud como error
-     */
     public void marcarError(String mensajeError, long tiempoEjecucionMs) {
         this.estado = EstadoSolicitud.ERROR;
         this.resultado = "ERROR: " + mensajeError;
@@ -124,14 +114,14 @@ public class SolicitudProceso {
 
     @Override
     public String toString() {
-        return "SolicitudProceso{" +
-                "id='" + id + '\'' +
-                ", usuarioId='" + usuarioId + '\'' +
-                ", procesoId='" + procesoId + '\'' +
-                ", fechaSolicitud=" + fechaSolicitud +
-                ", estado=" + estado +
-                ", resultado='" + resultado + '\'' +
-                ", tiempoEjecucionMs=" + tiempoEjecucionMs +
-                '}';
+        return "SolicitudProceso{"
+                + "id='" + id + '\''
+                + ", usuarioId='" + usuarioId + '\''
+                + ", proceso=" + (proceso != null ? proceso.getNombre() : "null")
+                + ", fechaSolicitud=" + fechaSolicitud
+                + ", estado=" + estado
+                + ", resultado='" + resultado + '\''
+                + ", tiempoEjecucionMs=" + tiempoEjecucionMs
+                + '}';
     }
 }

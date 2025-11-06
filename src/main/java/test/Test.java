@@ -11,10 +11,10 @@ public class Test {
 
         Scanner scanner = new Scanner(System.in);
 
-        // Obtener instancia del controller usando Singleton
+        
         UsuarioController usuarioController = UsuarioController.getInstance();
 
-        // Get user input
+        
         System.out.println("Ingrese el ID del usuario:");
         String id = scanner.nextLine();
 
@@ -33,7 +33,7 @@ public class Test {
         System.out.println("Ingrese el rol del usuario:");
         String rol = scanner.nextLine();
 
-        // Create user
+        
         usuarioController.crearUsuario(id, nombre, email, password, estado, rol);
 
         System.out.println("Usuario creado exitosamente.");

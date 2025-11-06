@@ -16,7 +16,7 @@ public class MongoPool {
     private MongoPool() {
         String envUrl = System.getenv("MONGO_URL");
         if (envUrl == null || envUrl.isEmpty()) {
-            envUrl = "mongodb://127.0.0.1:27017";
+            envUrl = "mongodb://localhost:27017";
         }
         url = envUrl;
         mongoClient = MongoClients.create(url);

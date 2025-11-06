@@ -14,6 +14,71 @@ import modelo.TipoSensor;
 
 public class MenuSensor implements Menu {
 
+    
+    private void menuMinMaxMediciones() {
+        System.out.println("--- Min/Max de Mediciones ---");
+        String tipoUbicacion = seleccionarUbicacion();
+        if (tipoUbicacion == null) {
+            return;
+        }
+        String valorUbicacion = seleccionarValorUbicacion(tipoUbicacion);
+        if (valorUbicacion == null) {
+            return;
+        }
+        String tipo = seleccionarTipo();
+        if (tipo == null) {
+            return;
+        }
+        Date[] fechas = ConsolaUtils.pedirRangoFechas(scanner);
+        if (fechas == null) {
+            return;
+        }
+        
+        List<Double> montos = controlador.MedicionesController.getInstance()
+                .obtenerMontosPorUbicacionYRango(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]
+                );
+        if (montos.isEmpty()) {
+            System.out.println("No hay mediciones para los filtros seleccionados.");
+        } else {
+            double min = montos.stream().min(Double::compare).get();
+            double max = montos.stream().max(Double::compare).get();
+            System.out.println("Monto mínimo: " + min);
+            System.out.println("Monto máximo: " + max);
+        }
+        esperarConfirmacion();
+    }
+
+    
+    private void menuPromedioMediciones() {
+        System.out.println("--- Promedio de Mediciones ---");
+        String tipoUbicacion = seleccionarUbicacion();
+        if (tipoUbicacion == null) {
+            return;
+        }
+        String valorUbicacion = seleccionarValorUbicacion(tipoUbicacion);
+        if (valorUbicacion == null) {
+            return;
+        }
+        String tipo = seleccionarTipo();
+        if (tipo == null) {
+            return;
+        }
+        Date[] fechas = ConsolaUtils.pedirRangoFechas(scanner);
+        if (fechas == null) {
+            return;
+        }
+        
+        List<Double> montos = controlador.MedicionesController.getInstance()
+                .obtenerMontosPorUbicacionYRango(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]);
+        if (montos.isEmpty()) {
+            System.out.println("No hay mediciones para los filtros seleccionados.");
+        } else {
+            double promedio = montos.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
+            System.out.println("Promedio de montos: " + promedio);
+        }
+        esperarConfirmacion();
+    }
+
     private final SensorController sensorController;
     private final Scanner scanner;
 
@@ -65,100 +130,32 @@ public class MenuSensor implements Menu {
                     esperarConfirmacion();
             }
         }
-
     }
 
-    // --- NUEVAS FUNCIONALIDADES ---
-    private void menuMinMaxMediciones() {
-        System.out.println("--- Min/Max de Mediciones ---");
-        String tipoUbicacion = seleccionarUbicacion();
-        if (tipoUbicacion == null) {
-            return;
-        }
-        String valorUbicacion = seleccionarValorUbicacion(tipoUbicacion);
-        if (valorUbicacion == null) {
-            return;
-        }
-        String tipo = seleccionarTipo();
-        if (tipo == null) {
-            return;
-        }
-        Date[] fechas = ConsolaUtils.pedirRangoFechas(scanner);
-        if (fechas == null) {
-            return;
-        }
-        List<Double> valores = obtenerValoresFiltrados(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]);
-        if (valores.isEmpty()) {
-            System.out.println("No hay mediciones para los filtros seleccionados.");
-        } else {
-            double min = valores.stream().min(Double::compare).get();
-            double max = valores.stream().max(Double::compare).get();
-            System.out.println("Valor mínimo: " + min);
-            System.out.println("Valor máximo: " + max);
-        }
-        esperarConfirmacion();
-    }
-
-    private void menuPromedioMediciones() {
-        System.out.println("--- Promedio de Mediciones ---");
-        String tipoUbicacion = seleccionarUbicacion();
-        if (tipoUbicacion == null) {
-            return;
-        }
-        String valorUbicacion = seleccionarValorUbicacion(tipoUbicacion);
-        if (valorUbicacion == null) {
-            return;
-        }
-        String tipo = seleccionarTipo();
-        if (tipo == null) {
-            return;
-        }
-        Date[] fechas = ConsolaUtils.pedirRangoFechas(scanner);
-        if (fechas == null) {
-            return;
-        }
-        List<Double> valores = obtenerValoresFiltrados(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]);
-        if (valores.isEmpty()) {
-            System.out.println("No hay mediciones para los filtros seleccionados.");
-        } else {
-            double promedio = valores.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
-            System.out.println("Promedio: " + promedio);
-        }
-        esperarConfirmacion();
-    }
-
-    // --- Selección específica de zona, ciudad o país ---
     private String seleccionarValorUbicacion(String tipoUbicacion) {
         List<String> opciones = new ArrayList<>();
         controlador.MedicionesController medicionesController = controlador.MedicionesController.getInstance();
-        switch (tipoUbicacion) {
-            case "zona": {
-                List<modelo.MedicionesPorZona> zonas = medicionesController.obtenerTodasZonas();
-                Set<String> zonasSet = new HashSet<>();
-                for (modelo.MedicionesPorZona m : zonas) {
-                    zonasSet.add(m.zona);
-                }
-                opciones.addAll(zonasSet);
-                break;
+        if ("zona".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorZona> zonas = medicionesController.obtenerTodasZonas();
+            Set<String> zonasSet = new HashSet<>();
+            for (modelo.MedicionesPorZona m : zonas) {
+                zonasSet.add(m.zona);
             }
-            case "ciudad": {
-                List<modelo.MedicionesPorCiudad> ciudades = medicionesController.obtenerTodasCiudades();
-                Set<String> ciudadesSet = new HashSet<>();
-                for (modelo.MedicionesPorCiudad m : ciudades) {
-                    ciudadesSet.add(m.ciudad);
-                }
-                opciones.addAll(ciudadesSet);
-                break;
+            opciones.addAll(zonasSet);
+        } else if ("ciudad".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorCiudad> ciudades = medicionesController.obtenerTodasCiudades();
+            Set<String> ciudadesSet = new HashSet<>();
+            for (modelo.MedicionesPorCiudad m : ciudades) {
+                ciudadesSet.add(m.ciudad);
             }
-            case "pais": {
-                List<modelo.MedicionesPorPais> paises = medicionesController.obtenerTodosPaises();
-                Set<String> paisesSet = new HashSet<>();
-                for (modelo.MedicionesPorPais m : paises) {
-                    paisesSet.add(m.pais);
-                }
-                opciones.addAll(paisesSet);
-                break;
+            opciones.addAll(ciudadesSet);
+        } else if ("pais".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorPais> paises = medicionesController.obtenerTodosPaises();
+            Set<String> paisesSet = new HashSet<>();
+            for (modelo.MedicionesPorPais m : paises) {
+                paisesSet.add(m.pais);
             }
+            opciones.addAll(paisesSet);
         }
         if (opciones.isEmpty()) {
             System.out.println("No hay datos disponibles para la ubicación seleccionada.");
@@ -173,7 +170,7 @@ public class MenuSensor implements Menu {
         return opciones.get(idx);
     }
 
-    // Métodos auxiliares para selección
+    
     private String seleccionarUbicacion() {
         System.out.println("Seleccione tipo de ubicación:");
         System.out.println("1. Zona");
@@ -181,16 +178,15 @@ public class MenuSensor implements Menu {
         System.out.println("3. País");
         System.out.print("Opción: ");
         String op = scanner.nextLine();
-        switch (op) {
-            case "1":
-                return "zona";
-            case "2":
-                return "ciudad";
-            case "3":
-                return "pais";
-            default:
-                System.out.println("Opción inválida.");
-                return null;
+        if ("1".equals(op)) {
+            return "zona";
+        } else if ("2".equals(op)) {
+            return "ciudad";
+        } else if ("3".equals(op)) {
+            return "pais";
+        } else {
+            System.out.println("Opción inválida.");
+            return null;
         }
     }
 
@@ -200,14 +196,13 @@ public class MenuSensor implements Menu {
         System.out.println("2. Humedad");
         System.out.print("Opción: ");
         String op = scanner.nextLine();
-        switch (op) {
-            case "1":
-                return "TEMPERATURA";
-            case "2":
-                return "HUMEDAD";
-            default:
-                System.out.println("Opción inválida.");
-                return null;
+        if ("1".equals(op)) {
+            return "TEMPERATURA";
+        } else if ("2".equals(op)) {
+            return "HUMEDAD";
+        } else {
+            System.out.println("Opción inválida.");
+            return null;
         }
     }
 
@@ -228,17 +223,17 @@ public class MenuSensor implements Menu {
         String nombre = scanner.nextLine();
         System.out.print("Tipo (temperatura/humedad): ");
         String tipoStr = scanner.nextLine().trim().toUpperCase();
-        TipoSensor tipo;
+        TipoSensor tipoSensor;
         switch (tipoStr) {
             case "TEMPERATURA":
-                tipo = TipoSensor.TEMPERATURA;
+                tipoSensor = TipoSensor.TEMPERATURA;
                 break;
             case "HUMEDAD":
-                tipo = TipoSensor.HUMEDAD;
+                tipoSensor = TipoSensor.HUMEDAD;
                 break;
             default:
                 System.out.println("Tipo inválido, se usará TEMPERATURA por defecto.");
-                tipo = TipoSensor.TEMPERATURA;
+                tipoSensor = TipoSensor.TEMPERATURA;
                 break;
         }
         System.out.print("Latitud: ");
@@ -253,23 +248,25 @@ public class MenuSensor implements Menu {
         String zona = scanner.nextLine();
         System.out.print("Estado (activo/inactivo/falla): ");
         String estadoStr = scanner.nextLine().trim().toUpperCase();
-        EstadoSensor estado;
+        EstadoSensor estadoSensor;
         switch (estadoStr) {
             case "ACTIVO":
-                estado = EstadoSensor.ACTIVO;
+                estadoSensor = EstadoSensor.ACTIVO;
                 break;
             case "INACTIVO":
-                estado = EstadoSensor.INACTIVO;
+                estadoSensor = EstadoSensor.INACTIVO;
                 break;
             case "FALLA":
-                estado = EstadoSensor.FALLA;
+                estadoSensor = EstadoSensor.FALLA;
                 break;
             default:
                 System.out.println("Estado inválido, se usará ACTIVO por defecto.");
-                estado = EstadoSensor.ACTIVO;
+                estadoSensor = EstadoSensor.ACTIVO;
         }
+        System.out.print("Monto por medición: ");
+        double montoPorMedicion = Double.parseDouble(scanner.nextLine());
         Date fechaInicio = new Date();
-        Sensor sensor = new Sensor(null, nombre, tipo, latitud, longitud, ciudad, pais, zona, estado, fechaInicio);
+        Sensor sensor = new Sensor(null, nombre, tipoSensor, latitud, longitud, ciudad, pais, zona, estadoSensor, fechaInicio, montoPorMedicion);
         sensorController.save(sensor);
         System.out.println("Sensor creado exitosamente.");
         esperarConfirmacion();
@@ -284,7 +281,7 @@ public class MenuSensor implements Menu {
         }
         System.out.println("\n--- Lista de Sensores ---");
         for (Sensor s : sensores) {
-            System.out.println("ID: " + s.getId() + ", Nombre: " + s.getNombre() + ", Tipo: " + s.getTipo() + ", Estado: " + s.getEstado() + ", Ciudad: " + s.getCiudad() + ", País: " + s.getPais() + ", Zona: " + s.getZona());
+            System.out.println(s);
         }
         esperarConfirmacion();
     }
@@ -294,33 +291,4 @@ public class MenuSensor implements Menu {
         scanner.nextLine();
     }
 
-    // --- Utilidad para filtrar valores según selección ---
-    private List<Double> obtenerValoresFiltrados(String tipoUbicacion, String valorUbicacion, String tipo, Date fechaInicio, Date fechaFin) {
-        List<Double> valores = new ArrayList<>();
-        controlador.MedicionesController medicionesController = controlador.MedicionesController.getInstance();
-        switch (tipoUbicacion) {
-            case "zona": {
-                List<modelo.MedicionesPorZona> mediciones = medicionesController.obtenerMedicionesPorZonaYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
-                for (modelo.MedicionesPorZona m : mediciones) {
-                    valores.add(m.valor);
-                }
-                break;
-            }
-            case "ciudad": {
-                List<modelo.MedicionesPorCiudad> mediciones = medicionesController.obtenerMedicionesPorCiudadYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
-                for (modelo.MedicionesPorCiudad m : mediciones) {
-                    valores.add(m.valor);
-                }
-                break;
-            }
-            case "pais": {
-                List<modelo.MedicionesPorPais> mediciones = medicionesController.obtenerMedicionesPorPaisYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
-                for (modelo.MedicionesPorPais m : mediciones) {
-                    valores.add(m.valor);
-                }
-                break;
-            }
-        }
-        return valores;
-    }
 }

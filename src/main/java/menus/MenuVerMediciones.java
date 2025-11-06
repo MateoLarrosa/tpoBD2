@@ -69,7 +69,7 @@ public class MenuVerMediciones implements Menu {
     }
 
     private void verMedicionesZona() {
-        // Obtener zonas únicas (de todas las mediciones)
+        
         List<MedicionesPorZona> todas = MedicionesCassandraRepository.getInstance().findAllZona();
         if (todas.isEmpty()) {
             System.out.println("No hay mediciones por zona registradas.");
@@ -108,7 +108,7 @@ public class MenuVerMediciones implements Menu {
         }
         String zonaSeleccionada = zonasList.get(seleccion - 1);
 
-        // Selección de tipo (opcional, si hay más de uno)
+        
         String tipoSeleccionado = null;
         if (tipos.size() > 1) {
             System.out.println("Tipos disponibles:");
@@ -135,7 +135,7 @@ public class MenuVerMediciones implements Menu {
             tipoSeleccionado = tipos.iterator().next();
         }
 
-        // Pedir rango de fechas
+        
         System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
         String fechaInicioStr = scanner.nextLine();
         System.out.print("Ingrese fecha de fin (dd/MM/yyyy): ");
@@ -152,7 +152,7 @@ public class MenuVerMediciones implements Menu {
             return;
         }
 
-        // Usar controller para registrar el proceso automáticamente
+        
         List<MedicionesPorZona> mediciones = medicionesController.obtenerMedicionesPorZonaYRango(zonaSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
         System.out.println("--- Mediciones para zona: " + zonaSeleccionada + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
         if (mediciones.isEmpty()) {
@@ -166,7 +166,7 @@ public class MenuVerMediciones implements Menu {
     }
 
     private void verMedicionesPais() {
-        // Obtener países únicos (de todas las mediciones)
+        
         List<MedicionesPorPais> todas = MedicionesCassandraRepository.getInstance().findAllPais();
         if (todas.isEmpty()) {
             System.out.println("No hay mediciones por país registradas.");
@@ -205,7 +205,7 @@ public class MenuVerMediciones implements Menu {
         }
         String paisSeleccionado = paisesList.get(seleccion - 1);
 
-        // Selección de tipo (opcional, si hay más de uno)
+        
         String tipoSeleccionado = null;
         if (tipos.size() > 1) {
             System.out.println("Tipos disponibles:");
@@ -232,7 +232,7 @@ public class MenuVerMediciones implements Menu {
             tipoSeleccionado = tipos.iterator().next();
         }
 
-        // Pedir rango de fechas
+        
         System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
         String fechaInicioStr = scanner.nextLine();
         System.out.print("Ingrese fecha de fin (dd/MM/yyyy): ");
@@ -249,7 +249,7 @@ public class MenuVerMediciones implements Menu {
             return;
         }
 
-        // Usar controller para registrar el proceso automáticamente
+        
         List<MedicionesPorPais> mediciones = medicionesController.obtenerMedicionesPorPaisYRango(paisSeleccionado, tipoSeleccionado, fechaInicio, fechaFin);
         System.out.println("--- Mediciones para país: " + paisSeleccionado + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
         if (mediciones.isEmpty()) {
@@ -263,7 +263,7 @@ public class MenuVerMediciones implements Menu {
     }
 
     private void verMedicionesCiudad() {
-        // Obtener ciudades únicas (de todas las mediciones)
+        
         List<MedicionesPorCiudad> todas = MedicionesCassandraRepository.getInstance().findAllCiudad();
         if (todas.isEmpty()) {
             System.out.println("No hay mediciones por ciudad registradas.");
@@ -302,7 +302,7 @@ public class MenuVerMediciones implements Menu {
         }
         String ciudadSeleccionada = ciudadesList.get(seleccion - 1);
 
-        // Selección de tipo (opcional, si hay más de uno)
+        
         String tipoSeleccionado = null;
         if (tipos.size() > 1) {
             System.out.println("Tipos disponibles:");
@@ -329,7 +329,7 @@ public class MenuVerMediciones implements Menu {
             tipoSeleccionado = tipos.iterator().next();
         }
 
-        // Pedir rango de fechas
+        
         System.out.print("Ingrese fecha de inicio (dd/MM/yyyy): ");
         String fechaInicioStr = scanner.nextLine();
         System.out.print("Ingrese fecha de fin (dd/MM/yyyy): ");
@@ -346,7 +346,7 @@ public class MenuVerMediciones implements Menu {
             return;
         }
 
-        // Usar controller para registrar el proceso automáticamente
+        
         List<MedicionesPorCiudad> mediciones = medicionesController.obtenerMedicionesPorCiudadYRango(ciudadSeleccionada, tipoSeleccionado, fechaInicio, fechaFin);
         System.out.println("--- Mediciones para ciudad: " + ciudadSeleccionada + " en rango " + fechaInicioStr + " a " + fechaFinStr + " ---");
         if (mediciones.isEmpty()) {

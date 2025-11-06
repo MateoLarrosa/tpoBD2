@@ -28,7 +28,7 @@ public class MenuPrincipal implements Menu {
         this.sensorController = SensorController.getInstance();
         options.add(new MenuOption("Iniciar sesión", this::iniciarSesion));
         options.add(new MenuOption("Crear usuario", this::crearUsuario));
-        options.add(new MenuOption("Menú de sensores", this::menuSensores));
+        // El menú de sensores se agrega dinámicamente después del login si el usuario es ADMIN
         options.add(new MenuOption("Salir", this::salir));
 
     }

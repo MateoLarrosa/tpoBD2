@@ -1,6 +1,5 @@
 package menus;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +13,6 @@ import modelo.Proceso;
 import modelo.SolicitudProceso;
 import services.ProcesoService;
 
-/**
- * Menú interactivo para gestionar facturas y pagos del usuario.
- */
 public class MenuFacturacion implements Menu {
 
     private final Scanner scanner;
@@ -102,17 +98,17 @@ public class MenuFacturacion implements Menu {
         System.out.println("\n--- GENERAR FACTURA MENSUAL ---");
         System.out.println("Se generará una factura con todos los procesos completados.");
         System.out.print("Días de vencimiento (ejemplo: 30): ");
-        
+
         int dias = ConsolaUtils.leerEntero(scanner);
-        
+
         Factura factura = facturaController.generarFacturaParaUsuario(usuarioId, dias);
-        
+
         if (factura != null) {
             System.out.println("\n✓ Factura generada exitosamente:");
             System.out.println("ID: " + factura.getId());
             System.out.println("Fecha emisión: " + factura.getFechaEmision().format(formatter));
             System.out.println("Fecha vencimiento: " + factura.getFechaVencimiento().format(formatter));
-            System.out.println("Procesos incluidos: " + factura.getProcesosFacturadosIds().size());
+            System.out.println("Procesos incluidos: " + factura.getSolicitudesFacturadas().size());
             System.out.println("Monto total: $" + String.format("%.2f", factura.getMontoTotal()));
             System.out.println("Estado: " + factura.getEstado());
         } else {
@@ -123,7 +119,7 @@ public class MenuFacturacion implements Menu {
     private void verMisFacturas() {
         System.out.println("\n--- MIS FACTURAS ---");
         List<Factura> facturas = facturaController.obtenerFacturasPorUsuario(usuarioId);
-        
+
         if (facturas.isEmpty()) {
             System.out.println("No tiene facturas registradas.");
             return;
@@ -139,7 +135,7 @@ public class MenuFacturacion implements Menu {
             System.out.println("   Fecha vencimiento: " + f.getFechaVencimiento().format(formatter));
             System.out.println("   Estado: " + f.getEstado());
             System.out.println("   Monto: $" + String.format("%.2f", f.getMontoTotal()));
-            System.out.println("   Procesos: " + f.getProcesosFacturadosIds().size());
+            System.out.println("   Procesos: " + f.getSolicitudesFacturadas().size());
             System.out.println();
         }
     }
@@ -147,7 +143,7 @@ public class MenuFacturacion implements Menu {
     private void verFacturasPendientes() {
         System.out.println("\n--- FACTURAS PENDIENTES ---");
         List<Factura> facturas = facturaController.obtenerFacturasPendientes(usuarioId);
-        
+
         if (facturas.isEmpty()) {
             System.out.println("✓ No tiene facturas pendientes.");
             return;
@@ -162,11 +158,11 @@ public class MenuFacturacion implements Menu {
             System.out.println("   Fecha emisión: " + f.getFechaEmision().format(formatter));
             System.out.println("   Fecha vencimiento: " + f.getFechaVencimiento().format(formatter));
             System.out.println("   Monto: $" + String.format("%.2f", f.getMontoTotal()));
-            
+
             if (f.estaVencida()) {
                 System.out.println("   ⚠️  VENCIDA");
             }
-            
+
             totalPendiente += f.getMontoTotal();
         }
 
@@ -176,7 +172,7 @@ public class MenuFacturacion implements Menu {
     private void verFacturasPagadas() {
         System.out.println("\n--- FACTURAS PAGADAS ---");
         List<Factura> facturas = facturaController.obtenerFacturasPagadas(usuarioId);
-        
+
         if (facturas.isEmpty()) {
             System.out.println("No tiene facturas pagadas.");
             return;
@@ -189,8 +185,7 @@ public class MenuFacturacion implements Menu {
             System.out.println("\n" + (i + 1) + ". ID: " + f.getId());
             System.out.println("   Fecha emisión: " + f.getFechaEmision().format(formatter));
             System.out.println("   Monto: $" + String.format("%.2f", f.getMontoTotal()));
-            
-            // Obtener información del pago
+
             Pago pago = pagoController.obtenerPagoPorFactura(f.getId());
             if (pago != null) {
                 System.out.println("   Pagado el: " + pago.getFechaPago().format(formatter));
@@ -210,7 +205,6 @@ public class MenuFacturacion implements Menu {
             return;
         }
 
-        // Verificar que pertenezca al usuario
         if (!factura.getUsuarioId().equals(usuarioId)) {
             System.out.println("✗ Esta factura no le pertenece.");
             return;
@@ -222,17 +216,17 @@ public class MenuFacturacion implements Menu {
         System.out.println("Fecha vencimiento: " + factura.getFechaVencimiento().format(formatter));
         System.out.println("Estado: " + factura.getEstado());
         System.out.println("Monto total: $" + String.format("%.2f", factura.getMontoTotal()));
-        
+
         System.out.println("\n--- PROCESOS FACTURADOS ---");
         List<SolicitudProceso> solicitudes = facturaController.obtenerDetalleProcesosDeLaFactura(facturaId);
-        
+
         if (solicitudes.isEmpty()) {
             System.out.println("No se encontraron detalles de procesos.");
         } else {
             for (int i = 0; i < solicitudes.size(); i++) {
                 SolicitudProceso sol = solicitudes.get(i);
-                Proceso proceso = procesoService.obtenerProcesoPorId(sol.getProcesoId());
-                
+                Proceso proceso = sol.getProceso();
+
                 System.out.println((i + 1) + ". " + (proceso != null ? proceso.getNombre() : "Proceso desconocido"));
                 System.out.println("   Fecha: " + sol.getFechaSolicitud().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
                 System.out.println("   Estado: " + sol.getEstado());
@@ -241,7 +235,6 @@ public class MenuFacturacion implements Menu {
             }
         }
 
-        // Si está pagada, mostrar info del pago
         if (factura.getEstado().name().equals("PAGADA")) {
             Pago pago = pagoController.obtenerPagoPorFactura(facturaId);
             if (pago != null) {
@@ -255,8 +248,7 @@ public class MenuFacturacion implements Menu {
 
     private void pagarFactura() {
         System.out.println("\n--- PAGAR FACTURA ---");
-        
-        // Mostrar facturas pendientes
+
         List<Factura> pendientes = facturaController.obtenerFacturasPendientes(usuarioId);
         if (pendientes.isEmpty()) {
             System.out.println("✓ No tiene facturas pendientes de pago.");
@@ -266,9 +258,9 @@ public class MenuFacturacion implements Menu {
         System.out.println("Facturas pendientes:");
         for (int i = 0; i < pendientes.size(); i++) {
             Factura f = pendientes.get(i);
-            System.out.println((i + 1) + ". ID: " + f.getId() + " - Monto: $" + 
-                             String.format("%.2f", f.getMontoTotal()) + 
-                             " - Vencimiento: " + f.getFechaVencimiento().format(formatter));
+            System.out.println((i + 1) + ". ID: " + f.getId() + " - Monto: $"
+                    + String.format("%.2f", f.getMontoTotal())
+                    + " - Vencimiento: " + f.getFechaVencimiento().format(formatter));
         }
 
         System.out.print("\nSeleccione el número de factura a pagar: ");
@@ -280,8 +272,8 @@ public class MenuFacturacion implements Menu {
         System.out.println("Monto a pagar: $" + String.format("%.2f", factura.getMontoTotal()));
 
         System.out.println("\nMétodos de pago disponibles:");
-        List<String> metodos = List.of("Tarjeta de crédito", "Tarjeta de débito", 
-                                       "Transferencia bancaria", "Efectivo", "MercadoPago");
+        List<String> metodos = List.of("Tarjeta de crédito", "Tarjeta de débito",
+                "Transferencia bancaria", "Efectivo", "MercadoPago");
         for (int i = 0; i < metodos.size(); i++) {
             System.out.println((i + 1) + ". " + metodos.get(i));
         }
@@ -290,8 +282,8 @@ public class MenuFacturacion implements Menu {
         int metodoIdx = ConsolaUtils.leerEnteroEnRango(scanner, 1, metodos.size()) - 1;
         String metodoPago = metodos.get(metodoIdx);
 
-        System.out.print("\n¿Confirmar pago de $" + String.format("%.2f", factura.getMontoTotal()) + 
-                        " con " + metodoPago + "? (S/N): ");
+        System.out.print("\n¿Confirmar pago de $" + String.format("%.2f", factura.getMontoTotal())
+                + " con " + metodoPago + "? (S/N): ");
         String confirmacion = scanner.nextLine();
 
         if (confirmacion.equalsIgnoreCase("S")) {
@@ -309,11 +301,11 @@ public class MenuFacturacion implements Menu {
     private void verEstadisticasFacturacion() {
         System.out.println("\n--- ESTADÍSTICAS DE FACTURACIÓN ---");
         double[] stats = facturaController.obtenerEstadisticasFacturacion(usuarioId);
-        
-        System.out.println("Total de facturas: " + (int)stats[0]);
-        System.out.println("Facturas pendientes: " + (int)stats[1]);
-        System.out.println("Facturas pagadas: " + (int)stats[2]);
-        System.out.println("Facturas vencidas: " + (int)stats[3]);
+
+        System.out.println("Total de facturas: " + (int) stats[0]);
+        System.out.println("Facturas pendientes: " + (int) stats[1]);
+        System.out.println("Facturas pagadas: " + (int) stats[2]);
+        System.out.println("Facturas vencidas: " + (int) stats[3]);
         System.out.println("Monto total facturado: $" + String.format("%.2f", stats[4]));
         System.out.println("Monto adeudado: $" + String.format("%.2f", stats[5]));
     }
@@ -321,15 +313,15 @@ public class MenuFacturacion implements Menu {
     private void verMontoAdeudado() {
         System.out.println("\n--- MONTO TOTAL ADEUDADO ---");
         double montoAdeudado = facturaController.calcularMontoAdeudado(usuarioId);
-        
+
         if (montoAdeudado == 0) {
             System.out.println("✓ No tiene deudas pendientes. ¡Está al día!");
         } else {
             System.out.println("⚠️  Monto adeudado: $" + String.format("%.2f", montoAdeudado));
-            
+
             List<Factura> pendientes = facturaController.obtenerFacturasPendientes(usuarioId);
             List<Factura> vencidas = facturaController.obtenerFacturasVencidas(usuarioId);
-            
+
             if (!pendientes.isEmpty()) {
                 System.out.println("\nFacturas pendientes: " + pendientes.size());
             }

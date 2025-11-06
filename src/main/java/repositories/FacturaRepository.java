@@ -15,12 +15,11 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 
 import modelo.EstadoFactura;
+import modelo.EstadoSolicitud;
 import modelo.Factura;
+import modelo.Proceso;
+import modelo.SolicitudProceso;
 
-/**
- * Repositorio para gestionar facturas de procesos.
- * Implementa el patrón Singleton.
- */
 public class FacturaRepository implements IRepository<Factura> {
 
     private final MongoDatabase database;
@@ -42,35 +41,95 @@ public class FacturaRepository implements IRepository<Factura> {
         Factura factura = new Factura();
         factura.setId(doc.getObjectId("_id").toString());
         factura.setUsuarioId(doc.getString("usuarioId"));
-        
+
         Date fechaEmisionDate = doc.getDate("fechaEmision");
         if (fechaEmisionDate != null) {
             factura.setFechaEmision(fechaEmisionDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
-        
-        List<String> procesosIds = doc.getList("procesosFacturadosIds", String.class);
-        factura.setProcesosFacturadosIds(procesosIds != null ? procesosIds : new ArrayList<>());
-        
+
+        List<Document> solicitudesDocs = doc.getList("solicitudesFacturadas", Document.class);
+        List<SolicitudProceso> solicitudes = new ArrayList<>();
+        if (solicitudesDocs != null) {
+            for (Document solDoc : solicitudesDocs) {
+                SolicitudProceso solicitud = mapDocumentToSolicitud(solDoc);
+                solicitudes.add(solicitud);
+            }
+        }
+        factura.setSolicitudesFacturadas(solicitudes);
+
         String estadoStr = doc.getString("estado");
         factura.setEstado(estadoStr != null ? EstadoFactura.valueOf(estadoStr) : EstadoFactura.PENDIENTE);
-        
+
         factura.setMontoTotal(doc.getDouble("montoTotal"));
-        
+
         Date fechaVencimientoDate = doc.getDate("fechaVencimiento");
         if (fechaVencimientoDate != null) {
             factura.setFechaVencimiento(fechaVencimientoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
-        
+
         return factura;
+    }
+
+    private SolicitudProceso mapDocumentToSolicitud(Document doc) {
+        SolicitudProceso solicitud = new SolicitudProceso();
+        solicitud.setId(doc.getString("id"));
+        solicitud.setUsuarioId(doc.getString("usuarioId"));
+
+        Document procesoDoc = doc.get("proceso", Document.class);
+        if (procesoDoc != null) {
+            Proceso proceso = new Proceso();
+            proceso.setId(procesoDoc.getString("id"));
+            proceso.setNombre(procesoDoc.getString("nombre"));
+            proceso.setDescripcion(procesoDoc.getString("descripcion"));
+            proceso.setTipoProceso(procesoDoc.getString("tipoProceso"));
+            proceso.setCosto(procesoDoc.getInteger("costo", 0));
+            solicitud.setProceso(proceso);
+        }
+
+        Date fechaSolicitud = doc.getDate("fechaSolicitud");
+        if (fechaSolicitud != null) {
+            solicitud.setFechaSolicitud(fechaSolicitud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
+
+        String estadoStr = doc.getString("estado");
+        if (estadoStr != null) {
+            solicitud.setEstado(EstadoSolicitud.valueOf(estadoStr));
+        }
+
+        Document parametrosDoc = doc.get("parametros", Document.class);
+        if (parametrosDoc != null) {
+            solicitud.setParametros(new java.util.HashMap<>(parametrosDoc));
+        }
+
+        solicitud.setResultado(doc.getString("resultado"));
+
+        Long tiempoEjecucion = doc.getLong("tiempoEjecucionMs");
+        if (tiempoEjecucion != null) {
+            solicitud.setTiempoEjecucionMs(tiempoEjecucion);
+        }
+
+        Date fechaCompletado = doc.getDate("fechaCompletado");
+        if (fechaCompletado != null) {
+            solicitud.setFechaCompletado(fechaCompletado.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
+
+        return solicitud;
     }
 
     @Override
     public InsertOneResult save(Factura factura) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
 
+        List<Document> solicitudesDocs = new ArrayList<>();
+        if (factura.getSolicitudesFacturadas() != null) {
+            for (SolicitudProceso solicitud : factura.getSolicitudesFacturadas()) {
+                solicitudesDocs.add(mapSolicitudToDocument(solicitud));
+            }
+        }
+
         Document doc = new Document("usuarioId", factura.getUsuarioId())
                 .append("fechaEmision", Date.from(factura.getFechaEmision().atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                .append("procesosFacturadosIds", factura.getProcesosFacturadosIds())
+                .append("solicitudesFacturadas", solicitudesDocs)
                 .append("estado", factura.getEstado().name())
                 .append("montoTotal", factura.getMontoTotal())
                 .append("fechaVencimiento", Date.from(factura.getFechaVencimiento().atStartOfDay(ZoneId.systemDefault()).toInstant()));
@@ -81,6 +140,38 @@ public class FacturaRepository implements IRepository<Factura> {
         }
 
         return result;
+    }
+
+    private Document mapSolicitudToDocument(SolicitudProceso solicitud) {
+        Document procesoDoc = null;
+        if (solicitud.getProceso() != null) {
+            Proceso proceso = solicitud.getProceso();
+            procesoDoc = new Document("id", proceso.getId())
+                    .append("nombre", proceso.getNombre())
+                    .append("descripcion", proceso.getDescripcion())
+                    .append("tipoProceso", proceso.getTipoProceso())
+                    .append("costo", proceso.getCosto());
+        }
+
+        Date fechaSolicitud = null;
+        if (solicitud.getFechaSolicitud() != null) {
+            fechaSolicitud = Date.from(solicitud.getFechaSolicitud().atZone(ZoneId.systemDefault()).toInstant());
+        }
+
+        Date fechaCompletado = null;
+        if (solicitud.getFechaCompletado() != null) {
+            fechaCompletado = Date.from(solicitud.getFechaCompletado().atZone(ZoneId.systemDefault()).toInstant());
+        }
+
+        return new Document("id", solicitud.getId())
+                .append("usuarioId", solicitud.getUsuarioId())
+                .append("proceso", procesoDoc)
+                .append("fechaSolicitud", fechaSolicitud)
+                .append("estado", solicitud.getEstado().name())
+                .append("parametros", solicitud.getParametros() != null ? new Document(solicitud.getParametros()) : null)
+                .append("resultado", solicitud.getResultado())
+                .append("tiempoEjecucionMs", solicitud.getTiempoEjecucionMs())
+                .append("fechaCompletado", fechaCompletado);
     }
 
     @Override
@@ -101,9 +192,16 @@ public class FacturaRepository implements IRepository<Factura> {
     public void update(Factura factura) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
 
+        List<Document> solicitudesDocs = new ArrayList<>();
+        if (factura.getSolicitudesFacturadas() != null) {
+            for (SolicitudProceso solicitud : factura.getSolicitudesFacturadas()) {
+                solicitudesDocs.add(mapSolicitudToDocument(solicitud));
+            }
+        }
+
         Document updateDoc = new Document("usuarioId", factura.getUsuarioId())
                 .append("fechaEmision", Date.from(factura.getFechaEmision().atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                .append("procesosFacturadosIds", factura.getProcesosFacturadosIds())
+                .append("solicitudesFacturadas", solicitudesDocs)
                 .append("estado", factura.getEstado().name())
                 .append("montoTotal", factura.getMontoTotal())
                 .append("fechaVencimiento", Date.from(factura.getFechaVencimiento().atStartOfDay(ZoneId.systemDefault()).toInstant()));
@@ -120,11 +218,6 @@ public class FacturaRepository implements IRepository<Factura> {
         collection.deleteOne(Filters.eq("_id", new ObjectId(id)));
     }
 
-    // Métodos de consulta específicos
-
-    /**
-     * Obtiene todas las facturas de un usuario
-     */
     public List<Factura> findByUsuarioId(String usuarioId) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Factura> facturas = new ArrayList<>();
@@ -134,9 +227,6 @@ public class FacturaRepository implements IRepository<Factura> {
         return facturas;
     }
 
-    /**
-     * Obtiene facturas por estado
-     */
     public List<Factura> findByEstado(EstadoFactura estado) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Factura> facturas = new ArrayList<>();
@@ -146,9 +236,6 @@ public class FacturaRepository implements IRepository<Factura> {
         return facturas;
     }
 
-    /**
-     * Obtiene facturas de un usuario por estado
-     */
     public List<Factura> findByUsuarioIdYEstado(String usuarioId, EstadoFactura estado) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Factura> facturas = new ArrayList<>();
@@ -161,14 +248,11 @@ public class FacturaRepository implements IRepository<Factura> {
         return facturas;
     }
 
-    /**
-     * Obtiene facturas vencidas (pendientes y con fecha de vencimiento pasada)
-     */
     public List<Factura> findFacturasVencidas() {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Factura> facturas = new ArrayList<>();
         Date hoy = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        
+
         collection.find(Filters.and(
                 Filters.eq("estado", EstadoFactura.PENDIENTE.name()),
                 Filters.lt("fechaVencimiento", hoy)
@@ -178,16 +262,13 @@ public class FacturaRepository implements IRepository<Factura> {
         return facturas;
     }
 
-    /**
-     * Obtiene facturas de un usuario en un rango de fechas
-     */
     public List<Factura> findByUsuarioIdYRangoFechas(String usuarioId, LocalDate fechaInicio, LocalDate fechaFin) {
         MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
         List<Factura> facturas = new ArrayList<>();
-        
+
         Date inicio = Date.from(fechaInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date fin = Date.from(fechaFin.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        
+
         collection.find(Filters.and(
                 Filters.eq("usuarioId", usuarioId),
                 Filters.gte("fechaEmision", inicio),

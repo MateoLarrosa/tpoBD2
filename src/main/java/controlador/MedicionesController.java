@@ -1,5 +1,6 @@
 package controlador;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +13,27 @@ import services.SolicitudProcesoService;
 public class MedicionesController {
 
     private static MedicionesController instance;
-    private String usuarioActualId; // ID del usuario que está usando el controlador
+    private String usuarioActualId; 
 
-    private MedicionesController() {
+    public List<Double> obtenerMontosPorUbicacionYRango(String tipoUbicacion, String valorUbicacion, String tipo, Date fechaInicio, Date fechaFin) {
+        List<Double> montos = new ArrayList<>();
+        if ("zona".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorZona> mediciones = obtenerMedicionesPorZonaYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
+            for (modelo.MedicionesPorZona m : mediciones) {
+                montos.add(m.monto);
+            }
+        } else if ("ciudad".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorCiudad> mediciones = obtenerMedicionesPorCiudadYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
+            for (modelo.MedicionesPorCiudad m : mediciones) {
+                montos.add(m.monto);
+            }
+        } else if ("pais".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorPais> mediciones = obtenerMedicionesPorPaisYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
+            for (modelo.MedicionesPorPais m : mediciones) {
+                montos.add(m.monto);
+            }
+        }
+        return montos;
     }
 
     public static MedicionesController getInstance() {
@@ -24,18 +43,10 @@ public class MedicionesController {
         return instance;
     }
 
-    /**
-     * Establece el usuario actual para registrar sus consultas
-     * @param usuarioId ID del usuario
-     */
     public void setUsuarioActual(String usuarioId) {
         this.usuarioActualId = usuarioId;
     }
 
-    /**
-     * Obtiene el ID del usuario actual
-     * @return ID del usuario actual
-     */
     public String getUsuarioActual() {
         return this.usuarioActualId;
     }
@@ -76,7 +87,7 @@ public class MedicionesController {
         }
     }
 
-    // Métodos para obtener mediciones filtradas
+    
     public List<modelo.MedicionesPorZona> obtenerMedicionesPorZonaYRango(String zona, String tipo, Date fechaInicio, Date fechaFin) {
         long inicio = System.currentTimeMillis();
         Map<String, Object> parametros = new HashMap<>();
@@ -84,13 +95,14 @@ public class MedicionesController {
         parametros.put("tipo", tipo);
         parametros.put("fechaInicio", fechaInicio);
         parametros.put("fechaFin", fechaFin);
-        
+
+        String proceso = getProcesoNombre("zona", tipo, "maxmin", fechaInicio, fechaFin);
         try {
             List<modelo.MedicionesPorZona> resultado = services.MedicionesService.getInstance().obtenerMedicionesPorZonaYRango(zona, tipo, fechaInicio, fechaFin);
-            registrarSolicitud("CONSULTA_MEDICIONES_ZONA", parametros, "ÉXITO - " + resultado.size() + " registros", inicio);
+            registrarSolicitud(proceso, parametros, "ÉXITO - " + resultado.size() + " registros", inicio);
             return resultado;
         } catch (Exception e) {
-            registrarSolicitud("CONSULTA_MEDICIONES_ZONA", parametros, "ERROR: " + e.getMessage(), inicio);
+            registrarSolicitud(proceso, parametros, "ERROR: " + e.getMessage(), inicio);
             throw e;
         }
     }
@@ -102,13 +114,14 @@ public class MedicionesController {
         parametros.put("tipo", tipo);
         parametros.put("fechaInicio", fechaInicio);
         parametros.put("fechaFin", fechaFin);
-        
+
+        String proceso = getProcesoNombre("pais", tipo, "maxmin", fechaInicio, fechaFin);
         try {
             List<modelo.MedicionesPorPais> resultado = services.MedicionesService.getInstance().obtenerMedicionesPorPaisYRango(pais, tipo, fechaInicio, fechaFin);
-            registrarSolicitud("CONSULTA_MEDICIONES_PAIS", parametros, "ÉXITO - " + resultado.size() + " registros", inicio);
+            registrarSolicitud(proceso, parametros, "ÉXITO - " + resultado.size() + " registros", inicio);
             return resultado;
         } catch (Exception e) {
-            registrarSolicitud("CONSULTA_MEDICIONES_PAIS", parametros, "ERROR: " + e.getMessage(), inicio);
+            registrarSolicitud(proceso, parametros, "ERROR: " + e.getMessage(), inicio);
             throw e;
         }
     }
@@ -120,15 +133,43 @@ public class MedicionesController {
         parametros.put("tipo", tipo);
         parametros.put("fechaInicio", fechaInicio);
         parametros.put("fechaFin", fechaFin);
-        
+
+        String proceso = getProcesoNombre("ciudad", tipo, "maxmin", fechaInicio, fechaFin);
         try {
             List<modelo.MedicionesPorCiudad> resultado = services.MedicionesService.getInstance().obtenerMedicionesPorCiudadYRango(ciudad, tipo, fechaInicio, fechaFin);
-            registrarSolicitud("CONSULTA_MEDICIONES_CIUDAD", parametros, "ÉXITO - " + resultado.size() + " registros", inicio);
+            registrarSolicitud(proceso, parametros, "ÉXITO - " + resultado.size() + " registros", inicio);
             return resultado;
         } catch (Exception e) {
-            registrarSolicitud("CONSULTA_MEDICIONES_CIUDAD", parametros, "ERROR: " + e.getMessage(), inicio);
+            registrarSolicitud(proceso, parametros, "ERROR: " + e.getMessage(), inicio);
             throw e;
         }
+    }
+
+    
+    private String getProcesoNombre(String ubicacion, String tipo, String operacion, Date fechaInicio, Date fechaFin) {
+        
+        
+        
+        
+        String periodo = "ANUAL";
+        if (fechaInicio != null && fechaFin != null) {
+            java.util.Calendar calIni = java.util.Calendar.getInstance();
+            java.util.Calendar calFin = java.util.Calendar.getInstance();
+            calIni.setTime(fechaInicio);
+            calFin.setTime(fechaFin);
+            if (calIni.get(java.util.Calendar.YEAR) == calFin.get(java.util.Calendar.YEAR)
+                    && calIni.get(java.util.Calendar.MONTH) == calFin.get(java.util.Calendar.MONTH)) {
+                periodo = "MENSUAL";
+            }
+        }
+        String base = "";
+        if ("maxmin".equals(operacion)) {
+            base = "INFORME_MAXMIN_";
+        } else if ("promedio".equals(operacion)) {
+            base = "INFORME_PROMEDIO_";
+        }
+        String ubic = ubicacion.toUpperCase();
+        return base + ubic + "_" + periodo;
     }
 
     public void agregarMedicion(Sensor sensor, String tipo, int anio, int mes, String fecha, double valor) {
@@ -140,7 +181,8 @@ public class MedicionesController {
         parametros.put("mes", mes);
         parametros.put("fecha", fecha);
         parametros.put("valor", valor);
-        
+        parametros.put("monto", sensor.getMontoPorMedicion());
+
         try {
             MedicionesService.getInstance().registrarMedicion(sensor, tipo, anio, mes, fecha, valor);
             registrarSolicitud("REGISTRAR_MEDICION", parametros, "ÉXITO", inicio);
@@ -159,9 +201,12 @@ public class MedicionesController {
         parametros.put("mes", mes);
         parametros.put("fecha", fecha);
         parametros.put("valor", valor);
-        
+        Sensor sensor = MedicionesService.getInstance().getSensorRepo().findById(sensorId);
+        if (sensor != null) {
+            parametros.put("monto", sensor.getMontoPorMedicion());
+        }
+
         try {
-            Sensor sensor = MedicionesService.getInstance().getSensorRepo().findById(sensorId);
             if (sensor == null) {
                 registrarSolicitud("REGISTRAR_MEDICION", parametros, "ERROR: Sensor no encontrado", inicio);
                 throw new IllegalArgumentException("Sensor no encontrado con id: " + sensorId);
@@ -174,18 +219,15 @@ public class MedicionesController {
         }
     }
 
-    /**
-     * Método auxiliar para registrar solicitudes de proceso
-     */
     private void registrarSolicitud(String nombreProceso, Map<String, Object> parametros, String resultado, long inicio) {
         if (usuarioActualId != null && !usuarioActualId.isEmpty()) {
             try {
                 long tiempoEjecucion = System.currentTimeMillis() - inicio;
                 SolicitudProcesoService.getInstance().registrarSolicitudCompletada(
-                    usuarioActualId, nombreProceso, parametros, resultado, tiempoEjecucion
+                        usuarioActualId, nombreProceso, parametros, resultado, tiempoEjecucion
                 );
             } catch (Exception e) {
-                // Error al registrar la solicitud, pero no interrumpir la operación principal
+                
                 System.err.println("Error al registrar solicitud de proceso: " + e.getMessage());
             }
         }

@@ -1,0 +1,4 @@
+<configuration>
+  <logger name="org.mongodb.driver" level="ERROR"/>
+  <root level="ERROR"/>
+</configuration>

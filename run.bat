@@ -1,0 +1,3 @@
+@echo off
+echo Ejecutando la aplicacion...
+java -jar target/CatalogoProductos-0.0.1-SNAPSHOT.jar

@@ -36,6 +36,27 @@ public class MedicionesController {
         return montos;
     }
 
+    public List<Double> obtenerValoresPorUbicacionYRango(String tipoUbicacion, String valorUbicacion, String tipo, Date fechaInicio, Date fechaFin) {
+        List<Double> valores = new ArrayList<>();
+        if ("zona".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorZona> mediciones = obtenerMedicionesPorZonaYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
+            for (modelo.MedicionesPorZona m : mediciones) {
+                valores.add(m.valor);
+            }
+        } else if ("ciudad".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorCiudad> mediciones = obtenerMedicionesPorCiudadYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
+            for (modelo.MedicionesPorCiudad m : mediciones) {
+                valores.add(m.valor);
+            }
+        } else if ("pais".equals(tipoUbicacion)) {
+            List<modelo.MedicionesPorPais> mediciones = obtenerMedicionesPorPaisYRango(valorUbicacion, tipo, fechaInicio, fechaFin);
+            for (modelo.MedicionesPorPais m : mediciones) {
+                valores.add(m.valor);
+            }
+        }
+        return valores;
+    }
+
     public static MedicionesController getInstance() {
         if (instance == null) {
             instance = new MedicionesController();

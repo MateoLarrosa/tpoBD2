@@ -34,16 +34,17 @@ public class MenuSensor implements Menu {
             return;
         }
         
-        List<Double> montos = controlador.MedicionesController.getInstance()
-                .obtenerMontosPorUbicacionYRango(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]
+        List<Double> valores = controlador.MedicionesController.getInstance()
+                .obtenerValoresPorUbicacionYRango(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]
                 );
-        if (montos.isEmpty()) {
+        if (valores.isEmpty()) {
             System.out.println("No hay mediciones para los filtros seleccionados.");
         } else {
-            double min = montos.stream().min(Double::compare).get();
-            double max = montos.stream().max(Double::compare).get();
-            System.out.println("Monto mínimo: " + min);
-            System.out.println("Monto máximo: " + max);
+            double min = valores.stream().min(Double::compare).get();
+            double max = valores.stream().max(Double::compare).get();
+            String unidad = tipo.equals("TEMPERATURA") ? "°C" : "%";
+            System.out.println("Valor mínimo: " + min + " " + unidad);
+            System.out.println("Valor máximo: " + max + " " + unidad);
         }
         esperarConfirmacion();
     }
@@ -68,13 +69,14 @@ public class MenuSensor implements Menu {
             return;
         }
         
-        List<Double> montos = controlador.MedicionesController.getInstance()
-                .obtenerMontosPorUbicacionYRango(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]);
-        if (montos.isEmpty()) {
+        List<Double> valores = controlador.MedicionesController.getInstance()
+                .obtenerValoresPorUbicacionYRango(tipoUbicacion, valorUbicacion, tipo, fechas[0], fechas[1]);
+        if (valores.isEmpty()) {
             System.out.println("No hay mediciones para los filtros seleccionados.");
         } else {
-            double promedio = montos.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
-            System.out.println("Promedio de montos: " + promedio);
+            double promedio = valores.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
+            String unidad = tipo.equals("TEMPERATURA") ? "°C" : "%";
+            System.out.println("Promedio de valores: " + String.format("%.2f", promedio) + " " + unidad);
         }
         esperarConfirmacion();
     }

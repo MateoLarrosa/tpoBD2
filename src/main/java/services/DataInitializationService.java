@@ -57,8 +57,6 @@ public class DataInitializationService {
         }
 
         System.out.println("Inicialización completada:");
-        System.out.println("  - Procesos creados: " + procesosCreados);
-        System.out.println("  - Procesos existentes: " + procesosExistentes);
     }
 
     /**

@@ -1,23 +1,20 @@
-
 #!/bin/bash
 
-# Exportar variables del .env
-export $(grep -v '^#' .env | xargs)
+echo "Compilando el proyecto..."
 
-# Cambiar al directorio del script
-cd "$(dirname $(realpath $0))"
+# Limpiar y compilar el proyecto
+mvn clean package -DskipTests
 
-# Detectar el directorio base del proyecto
-BASE_DIR=$(pwd)
-TARGET_DIR="$BASE_DIR/target/classes"
-DEPENDENCIES_DIR="$BASE_DIR/target/dependency"
+if [ $? -ne 0 ]; then
+    echo "Error durante la compilación."
+    exit 1
+fi
 
-# Asegurarse de que las dependencias estén descargadas
-mvn dependency:copy-dependencies -DoutputDirectory=$DEPENDENCIES_DIR
+echo "Ejecutando la aplicación..."
 
-# Compilar los archivos Java
-mvn compile
-
-# Ejecutar el archivo Main.class con todas las dependencias y suprimir logs de drivers
-JAVA_OPTS="-Dorg.mongodb.driver.level=ERROR -Dcom.datastax.oss.driver.level=ERROR"
-java $JAVA_OPTS -cp "$TARGET_DIR:$DEPENDENCIES_DIR/*" main.Main
+# Ejecutar el archivo Main.class con todas las dependencias
+# Usar ; como separador en Windows
+java -Dorg.mongodb.driver.level=ERROR \
+     -Dcom.datastax.oss.driver.level=ERROR \
+     -cp "target/classes;target/dependency/*" \
+     main.Main

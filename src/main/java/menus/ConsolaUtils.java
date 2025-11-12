@@ -59,6 +59,12 @@ public class ConsolaUtils {
     }
 
     public static void limpiarConsola() {
+        // No hacer nada - mantener el historial visible
+    }
+
+    public static void limpiarConsolaConPausa(Scanner scanner) {
+        System.out.println("\nPresione Enter para continuar...");
+        scanner.nextLine();
         try {
             if (System.getProperty("os.name").contains("Windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
